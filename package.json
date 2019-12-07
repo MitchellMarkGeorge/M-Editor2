@@ -1,5 +1,5 @@
 {
-  "name": "emo-chat",
+  "name": "m-editor2",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
@@ -15,8 +15,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.7.4",
-    "@babel/preset-env": "^7.7.4",
+    "@babel/core": "^7.7.5",
+    "@babel/preset-env": "^7.7.5",
     "@babel/preset-react": "^7.7.4",
     "babel-loader": "^8.0.6",
     "babel-preset-react-app": "^9.1.0",
