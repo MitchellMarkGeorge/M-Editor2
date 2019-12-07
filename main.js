@@ -29,8 +29,8 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 900, 
-    height: 680,
+    width: 750, 
+    height: 650,
     //titleBarStyle: 'hidden', // 'hidden-inset' - "removes" titlebar on MacOS 
     show: false, 
     webPreferences: {
