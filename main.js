@@ -31,7 +31,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 900, // set min and max values
     height: 700,
-    backgroundColor: '#3a3e4d',
+    backgroundColor: '#2c2f33',
     // might make frameless
     //titleBarStyle: 'hidden', // 'hidden-inset' - "removes" titlebar on MacOS 
     show: false, 

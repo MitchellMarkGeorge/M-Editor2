@@ -32,6 +32,10 @@ export default class EditorPage extends Component {
         
     }
 
+    getPath = () => {
+      ipcRenderer.send(GET_PROJECT_PATH)
+    }
+
     
 
     render() {
@@ -52,8 +56,9 @@ export default class EditorPage extends Component {
 
             <div className="low-bar">
                 <Icon type="api" className="low-bar-text"/>
-                <p className="low-bar-text">{this.state.currrentFileName}</p>
-                <p className="low-bar-text">{this.state.currentFileLang}</p>
+                {/* think about icon */}
+                <div className="low-bar-text">{this.state.currrentFileName}</div>
+                <div className="low-bar-text">{this.state.currentFileLang}</div>
                 {/* can have github icon show if git repo is present */}
             </div>
             </>

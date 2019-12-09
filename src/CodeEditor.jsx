@@ -80,9 +80,9 @@ export default class CodeEditor extends Component {
 
             {this.props.openFiles.length === 0 && 
             
-            <div style={{position: 'relative', height: '100%', backgroundColor: 'black'}}>
+            <div style={{position: 'relative', height: '100%', backgroundColor: '#14171d'}}>
                 <Empty className="no-selected-file" description={
-                    <span>No file selected. Color is back because i dont know what the editor color will be</span>
+                    <span>No file selected.</span>
                 }/>
             </div>}
                    

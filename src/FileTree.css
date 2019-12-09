@@ -2,7 +2,7 @@
     height: 100% !important;
     width: 100% !important;
     overflow: auto !important;
-    background-color: #3A3E4D;
+    background-color:  #2c2f33;
     
 
 }
@@ -17,7 +17,7 @@
     height: 30px; 
     line-height: 30px;
     white-space: nowrap;
-  background-color: #2C313B;
+  background-color: #23272a; 
     text-align: center;
     font-weight: bold;
     /* need line-heigt to be the same as height to center vertically*/
