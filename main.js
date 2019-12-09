@@ -1,7 +1,9 @@
-const { app, BrowserWindow, Menu , ipcMain} = require('electron');
+const { app, BrowserWindow, Menu , ipcMain, dialog} = require('electron');
 
 const path = require('path');
 const isDev = require('electron-is-dev');
+const { GET_PROJECT_PATH } = require('./utils/constants');
+const os = require('os')
 
 
 
@@ -51,6 +53,22 @@ function createWindow() {
 });
 }
 
+ipcMain.on(GET_PROJECT_PATH, () => {
+  console.log('open file dialog');
+  dialog.showOpenDialog(mainWindow, {title: 'Choose Project', defaultPath: os.homedir(), properties: ['openDirectory', 'showHiddenFiles', 'createDirectory', 'promptToCreate']})
+  .then((result) => {
+    if (result.canceled || result.filePaths[0] === os.homedir() || result.filePaths.length === 0){ // althoug the filepath will not be 0
+      console.log('CANCELED!!')
+      return;
+    } else {
+      let filepath = result.filePaths;
+      console.log(filepath);
+    }
+  }).catch(err => {
+    console.error(err);
+  })
+})
+
 
 // const dockMenu = Menu.buildFromTemplate([
 //     {
@@ -65,6 +83,7 @@ function createWindow() {
 //     }])
 
 // app.dock.setMenu(dockMenu);
+
 
 
 app.on('ready', createWindow);

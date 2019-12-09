@@ -33,7 +33,7 @@ export default class EditorPage extends Component {
     }
 
     getPath = () => {
-      ipcRenderer.send(GET_PROJECT_PATH)
+      ipcRenderer.send(GET_PROJECT_PATH, '')
     }
 
     
@@ -46,7 +46,7 @@ export default class EditorPage extends Component {
             {/* remove min size */}
               <SplitPane split="vertical" defaultSize={280} maxSize={350} minSize={0}> 
               {/* set max value */}
-                <FileTree file_tree={this.state.file_tree} projectPath={this.state.projectPath}/>
+                <FileTree file_tree={this.state.file_tree} getPath={this.getPath}/>
                 <CodeEditor currrentFileName={this.state.currrentFileName} currentFileLang={this.state.currentFileLang} openFiles={this.state.openFiles}/>
                 
                         

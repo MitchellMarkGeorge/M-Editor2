@@ -16,6 +16,10 @@ export default class Filetree extends Component {
         console.log('Trigger Expand');
       };
 
+    getPath = () => {
+        this.props.getPath();
+    }
+
     render() {
 
         
@@ -41,7 +45,7 @@ export default class Filetree extends Component {
             
             <div className="no-project">
                <p>No project has been selected.</p>
-               <Button type="primary">Select Project</Button>  
+               <Button type="primary" onClick={this.getPath}>Select Project</Button>  
             </div>}
 
 

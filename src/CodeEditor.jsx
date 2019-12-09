@@ -82,7 +82,7 @@ export default class CodeEditor extends Component {
             
             <div style={{position: 'relative', height: '100%', backgroundColor: '#14171d'}}>
                 <Empty className="no-selected-file" description={
-                    <span>No file selected.</span>
+                    <span>No file selected. (Not final color)</span>
                 }/>
             </div>}
                    
