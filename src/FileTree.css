@@ -2,5 +2,23 @@
     height: 100% !important;
     width: 100% !important;
     overflow: auto !important;
-    /* background-color: blue; */
+    background-color: #3A3E4D;
+    
+
+}
+
+.no-project {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+.file-tree-bar {
+    height: 30px; 
+    line-height: 30px;
+    white-space: nowrap;
+  background-color: #2C313B;
+    text-align: center;
+    font-weight: bold;
+    /* need line-heigt to be the same as height to center vertically*/
 }

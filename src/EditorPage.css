@@ -1,0 +1,32 @@
+.grid {
+    height: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    display: block !important;
+}
+
+.low-bar {
+    width: 100% !important;
+    height: 25px !important;
+    
+    line-height: 25px;
+    display: block !important;
+    border-top: 1px solid #000000;
+    /* position: relative !important; */
+    background-color: #2C313b !important;
+  }
+  
+  .low-bar-text {
+    display: inline;
+    text-align: center;
+    color: #bdbcbc;
+    /* line-height: 20px; */
+    /* font-size: 12px; */
+    font-size: 13px;
+    margin-left: 7px;
+    
+  
+    /* background-color: #21252b !important; */
+  }

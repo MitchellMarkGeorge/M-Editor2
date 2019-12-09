@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu , ipcMain} = require('electron');
 
 const path = require('path');
 const isDev = require('electron-is-dev');
@@ -29,8 +29,10 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 730, // set min and max values
-    height: 630,
+    width: 900, // set min and max values
+    height: 700,
+    backgroundColor: '#3a3e4d',
+    // might make frameless
     //titleBarStyle: 'hidden', // 'hidden-inset' - "removes" titlebar on MacOS 
     show: false, 
     webPreferences: {

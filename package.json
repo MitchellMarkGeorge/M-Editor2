@@ -37,6 +37,7 @@
   "dependencies": {
     "antd": "^3.26.0",
     "codemirror": "^5.49.2",
+    "codemirror-colorpicker": "^1.9.53",
     "electron-is-dev": "^1.1.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",

@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import * as codemirror from 'codemirror'
+import { Empty } from 'antd';
+import 'codemirror-colorpicker/dist/codemirror-colorpicker.css'
+import 'codemirror-colorpicker' 
+
 
 import './CodeEditor.css';
 
@@ -32,8 +36,10 @@ export default class CodeEditor extends Component {
     
 
     componentDidMount() {
-        console.log(this.editor);
+        // console.log(this.editor);
         // might try and call in constructure
+
+        //  FIGURE OUT EDITOR THEME
         let code = codemirror(this.editor, {
             value: "function myScript(){return 100;}\n",
             mode:  "javascript",
@@ -54,7 +60,10 @@ export default class CodeEditor extends Component {
             styleActiveLine: true,
             //placeholder: 'Code goes here...',
             keyMap: 'sublime',
-            theme: 'material-darker' // think about theme
+            theme: 'material-darker',
+            colorpicker : {
+                mode : 'edit'
+            } // think about theme
         })
 
         
@@ -67,17 +76,24 @@ export default class CodeEditor extends Component {
     <>
         <div className="editor-container">
                   
-            <div className="editor" ref={this.setEditor}></div>
+            {this.props.openFiles.length > 0 && <div className="editor" ref={this.setEditor}></div>}
 
-           
+            {this.props.openFiles.length === 0 && 
+            
+            <div style={{position: 'relative', height: '100%', backgroundColor: 'black'}}>
+                <Empty className="no-selected-file" description={
+                    <span>No file selected. Color is back because i dont know what the editor color will be</span>
+                }/>
+            </div>}
                    
  
         </div>
 
-            <div className="low-bar">
-                <p className="low-bar-text">{this.props.currrentFileName}</p>
-                <div className="low-bar-text">{this.props.currentFileLang}</div>
-            </div>
+    
+            
+          
+
+            
          </>   
     
         );

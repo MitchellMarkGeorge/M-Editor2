@@ -36,9 +36,9 @@ import 'codemirror/mode/meta.js';
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/keymap/sublime.js';
 import 'codemirror/addon/lint/lint.js';
-import 'codemirror/addon/lint/javascript-lint.js';
-import 'codemirror/addon/lint/json-lint.js';
-import 'codemirror/addon/lint/css-lint.js';
+// import 'codemirror/addon/lint/javascript-lint.js';
+// import 'codemirror/addon/lint/json-lint.js';
+// import 'codemirror/addon/lint/css-lint.js';
 import 'codemirror/addon/display/autorefresh.js'
 
 
@@ -72,9 +72,9 @@ class App extends Component {
     render() {
        
         return (
-            <>
-                <EditorPage />
-            </>
+            
+            <EditorPage />
+            
         ); 
     }
 }

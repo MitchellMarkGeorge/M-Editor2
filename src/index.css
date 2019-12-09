@@ -16,7 +16,9 @@ body, html, #root {
     margin: 0;
     height: 100%;
     width: 100%;
-    color: rgba(0, 0, 0, 0.65) !important;
+    background-color: #3a3e4d;
+    /* color: rgba(0, 0, 0, 0.65) !important; */
+    color: #c1c1c2 !important; 
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
     'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol';
@@ -71,8 +73,8 @@ body, html, #root {
   .Resizer.vertical {
     width: 11px;
     margin: 0 -5px;
-    /* border-left: 5px solid rgba(255, 255, 255, 0);
-    border-right: 5px solid rgba(255, 255, 255, 0); */
+    border-left: 5px solid rgba(255, 255, 255, 0);
+    border-right: 5px solid rgba(255, 255, 255, 0);
     cursor: col-resize;
   }
   
@@ -84,19 +86,6 @@ body, html, #root {
     background-clip: padding-box;
   }
 
-  .ant-tabs .ant-tabs-top-content, .ant-tabs .ant-tabs-bottom-content {
-      height: 100% !important;
-      
-  }
-
-  .ant-tabs {
-    height: 100% !important;
-    
-  }
-
-  .ant-tabs-bar {
-      margin: 0 !important;
-      /* position: fixed !important; */
-      /* position: sticky !important; */
-      
-  }
+.row {
+  height: calc(100% - 25px) !important;
+}
