@@ -5,11 +5,12 @@ import FileTree from './FileTree';
 import SplitPane from 'react-split-pane';
 import { ipcRenderer } from 'electron';
 import { Icon } from 'antd';
+import walk from './FileDta'; 
 
 
 import { Row, Col } from 'antd';
 
-import { GET_PROJECT_PATH } from '../utils/constants';
+import { GET_PROJECT_PATH,  RECEIVED_PROJECT_PATH} from '../utils/constants';
 
 import './EditorPage.css'
 
@@ -30,10 +31,57 @@ export default class EditorPage extends Component {
         }
 
         
+
+        
     }
 
-    getPath = () => {
-      ipcRenderer.send(GET_PROJECT_PATH, '')
+    componentDidMount() {
+      ipcRenderer.on(RECEIVED_PROJECT_PATH, (event, arg) => {
+          // console.log(arg);
+          const [ project_path ] = arg;
+
+      walk(project_path, (err, result) => {
+        if (result) { // handle error
+        //console.log(result);
+        this.setState({file_tree: [result], projectPath: project_path});
+      }
+
+      })
+      })
+    }
+
+    refreshFileTree = () => {
+
+      walk(this.state.projectPath, (err, result) => {
+        if (result) { // handle error
+        //console.log(result);
+        this.setState({file_tree: [result]})
+      
+      }
+    })
+  }
+  
+    onClick = (keys, event) => {
+      console.log(event);
+      this.setState({openFiles: [event.node, ...this.state.openFiles]})
+      console.log(this.state.openFiles);
+    }
+
+
+    getPath =  () => {
+      ipcRenderer.send(GET_PROJECT_PATH, '');
+      // walk('/Users/mitch/Resource-Ottawa-App').then(result => {console.log(result)})
+      // walk('/Users/mitch/Resource-Ottawa-App', (err, result) => {
+      //   if (result) {
+      //   console.log(result);
+      //   this.setState({file_tree: [result]})
+      // }
+
+      // })
+      // let tree = new Fil2('/Users/mitch/Resource-Ottawa-App');
+      //  tree.build();
+      // console.log(tree);
+      // this.setState({file_tree: [tree]})
     }
 
     
@@ -46,7 +94,7 @@ export default class EditorPage extends Component {
             {/* remove min size */}
               <SplitPane split="vertical" defaultSize={280} maxSize={350} minSize={0}> 
               {/* set max value */}
-                <FileTree file_tree={this.state.file_tree} getPath={this.getPath}/>
+                <FileTree file_tree={this.state.file_tree} getPath={this.getPath} onClick={this.onClick}/>
                 <CodeEditor currrentFileName={this.state.currrentFileName} currentFileLang={this.state.currentFileLang} openFiles={this.state.openFiles}/>
                 
                         

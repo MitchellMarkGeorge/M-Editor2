@@ -2,7 +2,8 @@ const { app, BrowserWindow, Menu , ipcMain, dialog} = require('electron');
 
 const path = require('path');
 const isDev = require('electron-is-dev');
-const { GET_PROJECT_PATH } = require('./utils/constants');
+const { GET_PROJECT_PATH, RECEIVED_PROJECT_PATH} = require('./utils/constants');
+// const FileTree = require('./src/Filetree').FileTree;
 const os = require('os')
 
 
@@ -53,7 +54,7 @@ function createWindow() {
 });
 }
 
-ipcMain.on(GET_PROJECT_PATH, () => {
+ipcMain.on(GET_PROJECT_PATH, (event, arg) => {
   console.log('open file dialog');
   dialog.showOpenDialog(mainWindow, {title: 'Choose Project', defaultPath: os.homedir(), properties: ['openDirectory', 'showHiddenFiles', 'createDirectory', 'promptToCreate']})
   .then((result) => {
@@ -62,7 +63,10 @@ ipcMain.on(GET_PROJECT_PATH, () => {
       return;
     } else {
       let filepath = result.filePaths;
-      console.log(filepath);
+      mainWindow.webContents.send(RECEIVED_PROJECT_PATH, filepath)
+      // let file_tree = new FileTree(filepath, path.basename(filepath));
+      // file_tree.build();
+      // console.log(filepath);
     }
   }).catch(err => {
     console.error(err);

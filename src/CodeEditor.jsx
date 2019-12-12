@@ -35,11 +35,41 @@ export default class CodeEditor extends Component {
 
     
 
-    componentDidMount() {
-        // console.log(this.editor);
-        // might try and call in constructure
+    // componentDidMount() {
+    //     // console.log(this.editor);
+    //     // might try and call in constructure
 
-        //  FIGURE OUT EDITOR THEME
+    //     //  FIGURE OUT EDITOR THEME
+    //     let code = codemirror(this.editor, {
+    //         value: "function myScript(){return 100;}\n",
+    //         mode:  "javascript",
+    //         lineNumbers: true,
+    //         autocorrect: true,
+    //         spellcheck: true,
+    //         matchBrackets: true,
+    //         matchTags: true,
+    //         autoCloseBrackets: true,
+    //         autoCloseTags: true,
+    //         showMatchesOnScrollbar: true,
+    //         smartIndent: true,
+    //         indentWithTabs: true,
+    //         hintOptions: {completeSingle: false},
+    //         lint: true,
+    //         // gutters: ["CodeMirror-lint-markers"],
+    //         lineWrapping: true, // lines should not be too long anywahy
+    //         styleActiveLine: true,
+    //         //placeholder: 'Code goes here...',
+    //         keyMap: 'sublime',
+    //         theme: 'material-darker',
+    //         colorpicker : {
+    //             mode : 'edit'
+    //         } // think about theme
+    //     })
+
+        
+    // }
+    // read up on component lifecycle events
+    componentDidUpdate() { // do i still need this method??
         let code = codemirror(this.editor, {
             value: "function myScript(){return 100;}\n",
             mode:  "javascript",
@@ -66,8 +96,10 @@ export default class CodeEditor extends Component {
             } // think about theme
         })
 
-        
+        //this.swapDoc();
     }
+
+    swapDoc = () => {}
 
     render() {
 
@@ -76,7 +108,12 @@ export default class CodeEditor extends Component {
     <>
         <div className="editor-container">
                   
-            {this.props.openFiles.length > 0 && <div className="editor" ref={this.setEditor}></div>}
+            {this.props.openFiles.length > 0 && 
+            <div className="loaded-editor">
+                <div className="open-files"></div>
+                <div className="editor" ref={this.setEditor}></div>
+            </div>
+            }
 
             {this.props.openFiles.length === 0 && 
             
