@@ -30,7 +30,8 @@ body, html, #root {
 .CodeMirror {
 
   height: 100%;
-  width: 100%;
+  max-width: 100%;
+  overflow: auto !important; 
 
 
     /* margin: 0;

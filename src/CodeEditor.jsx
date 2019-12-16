@@ -5,6 +5,7 @@ import 'codemirror-colorpicker/dist/codemirror-colorpicker.css'
 import 'codemirror-colorpicker' 
 
 
+
 import './CodeEditor.css';
 
 
@@ -21,6 +22,10 @@ export default class CodeEditor extends Component {
         
         this.editor = null;
 
+        this.state = {
+            currentFile: this.props.currentFile
+        };
+
         
 
         
@@ -33,11 +38,36 @@ export default class CodeEditor extends Component {
         this.editor = ref;
     }
 
+    // static getDerivedStateFromProps(props, state) {
+
+        
+    //     if (props.currentFile.path !== state.currentFile.path) {
+    //       return {
+    //         currentFile: props.currentFile,
+            
+            
+            
+    //       };
+    //     }
+
     
+    //   }
+
+    static getDerivedStateFromProps(props, state) {
+        // Any time the current user changes,
+        // Reset any parts of state that are tied to that user.
+        // In this simple example, that's just the email.
+        if (props.currentFile !== state.currentFile) {
+          return { 
+            currentFile: props.currentFile,
+          };
+        }
+        return null;
+      }
 
     // componentDidMount() {
     //     // console.log(this.editor);
-    //     // might try and call in constructure
+  
 
     //     //  FIGURE OUT EDITOR THEME
     //     let code = codemirror(this.editor, {
@@ -68,10 +98,24 @@ export default class CodeEditor extends Component {
 
         
     // }
+
+    
     // read up on component lifecycle events
-    componentDidUpdate() { // do i still need this method??
+     componentDidUpdate(prevProps) { 
+
+    
+
+            
+
+            // if (this.props.currentFile !== this.prevProps.currentFile) {
+            //     this.setState({currentFile: this.props.currentFile});
+            // }
+        // this.props.currentFile.props.title;
+        // do i still need this method?? 
+
+    
         let code = codemirror(this.editor, {
-            value: "function myScript(){return 100;}\n",
+            value: `Hello ${this.props.currentFile}`, 
             mode:  "javascript",
             lineNumbers: true,
             autocorrect: true,
@@ -86,7 +130,7 @@ export default class CodeEditor extends Component {
             hintOptions: {completeSingle: false},
             lint: true,
             // gutters: ["CodeMirror-lint-markers"],
-            lineWrapping: true, // lines should not be too long anywahy
+            // lineWrapping: true, // lines should not be too long anywahy
             styleActiveLine: true,
             //placeholder: 'Code goes here...',
             keyMap: 'sublime',
@@ -95,11 +139,14 @@ export default class CodeEditor extends Component {
                 mode : 'edit'
             } // think about theme
         })
+    
 
-        //this.swapDoc();
+        //this.swapDoc(); 
     }
 
     swapDoc = () => {}
+
+    
 
     render() {
 
@@ -108,14 +155,13 @@ export default class CodeEditor extends Component {
     <>
         <div className="editor-container">
                   
-            {this.props.openFiles.length > 0 && 
-            <div className="loaded-editor">
-                <div className="open-files"></div>
+            {this.state.currentFile !== null && 
+            
                 <div className="editor" ref={this.setEditor}></div>
-            </div>
+          
             }
 
-            {this.props.openFiles.length === 0 && 
+            {this.state.currentFile === null && 
             
             <div style={{position: 'relative', height: '100%', backgroundColor: '#14171d'}}>
                 <Empty className="no-selected-file" description={
@@ -124,7 +170,7 @@ export default class CodeEditor extends Component {
             </div>}
                    
  
-        </div>
+        </div> 
 
     
             

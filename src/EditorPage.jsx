@@ -62,9 +62,10 @@ export default class EditorPage extends Component {
   }
   
     onClick = (keys, event) => {
-      console.log(event);
-      this.setState({openFiles: [event.node, ...this.state.openFiles]})
-      console.log(this.state.openFiles);
+      //console.log(event);
+      this.setState({currentFile: event.node.props.title})
+      console.log(`clicked ${event.node.props.title}`)
+      //console.log(this.state.currentFile);
     }
 
 
@@ -95,7 +96,7 @@ export default class EditorPage extends Component {
               <SplitPane split="vertical" defaultSize={280} maxSize={350} minSize={0}> 
               {/* set max value */}
                 <FileTree file_tree={this.state.file_tree} getPath={this.getPath} onClick={this.onClick}/>
-                <CodeEditor currrentFileName={this.state.currrentFileName} currentFileLang={this.state.currentFileLang} openFiles={this.state.openFiles}/>
+                <CodeEditor currrentFileName={this.state.currrentFileName} currentFileLang={this.state.currentFileLang} openFiles={this.state.openFiles} currentFile={this.state.currentFile}/>
                 
                         
               </SplitPane>
