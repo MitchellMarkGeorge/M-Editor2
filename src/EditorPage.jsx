@@ -22,7 +22,7 @@ export default class EditorPage extends Component {
         this.state = {
           file_tree: [],  
           openFiles: [], 
-          currentFile: null,
+          currentFile: undefined,
           projectPath: '',
           currrentFileName: 'Welcome. Select a file to begin.',
           currentFileLang: ''
@@ -63,7 +63,7 @@ export default class EditorPage extends Component {
   
     onClick = (keys, event) => {
       //console.log(event);
-      this.setState({currentFile: event.node.props.title})
+      this.setState({currentFile: event.node})
       console.log(`clicked ${event.node.props.title}`)
       //console.log(this.state.currentFile);
     }

@@ -23,7 +23,7 @@ export default class CodeEditor extends Component {
         this.editor = null;
 
         this.state = {
-            currentFile: this.props.currentFile
+            currentFile: undefined
         };
 
         
