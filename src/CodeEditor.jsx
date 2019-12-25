@@ -57,7 +57,7 @@ export default class CodeEditor extends Component {
         // Any time the current user changes,
         // Reset any parts of state that are tied to that user.
         // In this simple example, that's just the email.
-        if (props.currentFile.title !== state.currentFile.title) {
+        if (props.currentFile !== state.currentFile) {
           return { 
             currentFile: props.currentFile,
           };
@@ -155,13 +155,13 @@ export default class CodeEditor extends Component {
     <>
         <div className="editor-container">
                   
-            {this.state.currentFile !== null && 
+            {this.state.currentFile !== undefined && 
             
                 <div className="editor" ref={this.setEditor}></div>
           
             }
 
-            {this.state.currentFile === null && 
+            {this.state.currentFile === undefined && 
             
             <div style={{position: 'relative', height: '100%', backgroundColor: '#14171d'}}>
                 <Empty className="no-selected-file" description={

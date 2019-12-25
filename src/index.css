@@ -88,5 +88,5 @@ body, html, #root {
   }
 
 .row {
-  height: calc(100% - 25px) !important;
+  height: calc(100% - 25px - 28px) !important;
 }

@@ -5,6 +5,9 @@ import CodeEditor from './CodeEditor'
 import EditorPage from './EditorPage';
 import { Button } from 'antd';
 
+import { TitleBar } from 'electron-react-titlebar';
+import 'electron-react-titlebar/assets/style.css';
+
 import './index.css';
 import 'antd/dist/antd.css';
 
@@ -72,9 +75,10 @@ class App extends Component {
     render() {
        
         return (
-            
-            <EditorPage />
-            
+            <>
+                <TitleBar />
+                <EditorPage />
+            </>
         ); 
     }
 }

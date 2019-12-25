@@ -35,6 +35,7 @@ function createWindow() {
     width: 900, // set min and max values
     height: 700,
     backgroundColor: '#2c2f33',
+    frame: false,
     // might make frameless
     //titleBarStyle: 'hidden', // 'hidden-inset' - "removes" titlebar on MacOS 
     show: false, 

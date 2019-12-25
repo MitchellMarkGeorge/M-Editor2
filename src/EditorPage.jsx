@@ -10,6 +10,9 @@ import walk from './FileDta';
 
 import { Row, Col } from 'antd';
 
+import { Layout } from 'antd';
+const { Content, Footer, Sider } = Layout;
+
 import { GET_PROJECT_PATH,  RECEIVED_PROJECT_PATH} from '../utils/constants';
 
 import './EditorPage.css'
