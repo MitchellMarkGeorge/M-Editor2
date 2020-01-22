@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import * as codemirror from 'codemirror'
-import { Empty } from 'antd';
+// import { Empty } from 'antd';
 import 'codemirror-colorpicker/dist/codemirror-colorpicker.css'
 import 'codemirror-colorpicker' 
 
@@ -17,10 +17,13 @@ import './CodeEditor.css';
 
 export default class CodeEditor extends Component {
 
+    codeEditor;
+
     constructor(props){
         super(props);
         
         this.editor = null;
+        
 
         this.state = {
             currentFile: undefined
@@ -57,7 +60,7 @@ export default class CodeEditor extends Component {
         // Any time the current user changes,
         // Reset any parts of state that are tied to that user.
         // In this simple example, that's just the email.
-        if (props.currentFile !== state.currentFile) {
+        if (props?.currentFile?.props?.title !== state.currentFile.props.title) {
           return { 
             currentFile: props.currentFile,
           };
@@ -65,57 +68,13 @@ export default class CodeEditor extends Component {
         return null;
       }
 
-    // componentDidMount() {
-    //     // console.log(this.editor);
+    componentDidMount() {
+        // console.log(this.editor);
   
 
-    //     //  FIGURE OUT EDITOR THEME
-    //     let code = codemirror(this.editor, {
-    //         value: "function myScript(){return 100;}\n",
-    //         mode:  "javascript",
-    //         lineNumbers: true,
-    //         autocorrect: true,
-    //         spellcheck: true,
-    //         matchBrackets: true,
-    //         matchTags: true,
-    //         autoCloseBrackets: true,
-    //         autoCloseTags: true,
-    //         showMatchesOnScrollbar: true,
-    //         smartIndent: true,
-    //         indentWithTabs: true,
-    //         hintOptions: {completeSingle: false},
-    //         lint: true,
-    //         // gutters: ["CodeMirror-lint-markers"],
-    //         lineWrapping: true, // lines should not be too long anywahy
-    //         styleActiveLine: true,
-    //         //placeholder: 'Code goes here...',
-    //         keyMap: 'sublime',
-    //         theme: 'material-darker',
-    //         colorpicker : {
-    //             mode : 'edit'
-    //         } // think about theme
-    //     })
-
-        
-    // }
-
-    
-    // read up on component lifecycle events
-     componentDidUpdate(prevProps) { 
-
-    
-
-            
-
-            // if (this.props.currentFile !== this.prevProps.currentFile) {
-            //     this.setState({currentFile: this.props.currentFile});
-            // }
-        // this.props.currentFile.props.title;
-        // do i still need this method?? 
-
-    
-        let code = codemirror(this.editor, {
-            value: `Hello ${this.props.currentFile}`, 
+        //  FIGURE OUT EDITOR THEME
+        this.codeEditor = codemirror(this.editor, {
+            value: "function myScript(){return 100;}\n",
             mode:  "javascript",
             lineNumbers: true,
             autocorrect: true,
@@ -139,10 +98,58 @@ export default class CodeEditor extends Component {
                 mode : 'edit'
             } // think about theme
         })
+
+        
+    }
+
+    componentDidUpdate() {
+        this.codeEditor.setOption('value', this.state.currentFile.props.title)
+    }
+
+    
+    // read up on component lifecycle events
+    //  componentDidUpdate(prevProps) { 
+
     
 
-        //this.swapDoc(); 
-    }
+            
+
+    //         // if (this.props.currentFile !== this.prevProps.currentFile) {
+    //         //     this.setState({currentFile: this.props.currentFile});
+    //         // }
+    //     // this.props.currentFile.props.title;
+    //     // do i still need this method?? 
+
+    
+    //     let code = codemirror(this.editor, {
+    //         //value: `Hello ${this.props.currentFile}`, 
+    //         mode:  "javascript",
+    //         lineNumbers: true,
+    //         autocorrect: true,
+    //         spellcheck: true,
+    //         matchBrackets: true,
+    //         matchTags: true,
+    //         autoCloseBrackets: true,
+    //         autoCloseTags: true,
+    //         showMatchesOnScrollbar: true,
+    //         smartIndent: true,
+    //         indentWithTabs: true,
+    //         hintOptions: {completeSingle: false},
+    //         lint: true,
+    //         // gutters: ["CodeMirror-lint-markers"],
+    //         // lineWrapping: true, // lines should not be too long anywahy
+    //         styleActiveLine: true,
+    //         //placeholder: 'Code goes here...',
+    //         keyMap: 'sublime',
+    //         theme: 'material-darker',
+    //         colorpicker : {
+    //             mode : 'edit'
+    //         } // think about theme
+    //     })
+    
+
+    //     //this.swapDoc(); 
+    // }
 
     swapDoc = () => {}
 
@@ -155,19 +162,21 @@ export default class CodeEditor extends Component {
     <>
         <div className="editor-container">
                   
-            {this.state.currentFile !== undefined && 
+            {/* {this.state.currentFile !== undefined && 
             
                 <div className="editor" ref={this.setEditor}></div>
           
-            }
+            } */}
 
-            {this.state.currentFile === undefined && 
+                <div className="editor" ref={this.setEditor}></div>
+
+            {/* {this.state.currentFile === undefined && 
             
             <div style={{position: 'relative', height: '100%', backgroundColor: '#14171d'}}>
                 <Empty className="no-selected-file" description={
                     <span>No file selected. (Not final color)</span>
                 }/>
-            </div>}
+            </div>} */}
                    
  
         </div> 

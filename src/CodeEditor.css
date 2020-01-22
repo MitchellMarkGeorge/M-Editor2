@@ -24,9 +24,12 @@
 
 .editor-container {
   height: 100%;
-  width: 100%;
+  /* box-sizing: content-box; */
+  /* width: 100%; */
+  /* width: 100%; */
   /* display: block; */
-  border-left: 1px solid #14171d;
+  /* border-left: 1px solid #14171d; */
+  overflow: scroll;
 }
 
 

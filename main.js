@@ -34,8 +34,12 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 900, // set min and max values
     height: 700,
+    minWidth: 450,
+    minHeight: 350,
+    title: 'M-Editor',
     backgroundColor: '#2c2f33',
-    frame: false,
+    // frame: false,
+    // titleBarStyle: 'hidden',
     // might make frameless
     //titleBarStyle: 'hidden', // 'hidden-inset' - "removes" titlebar on MacOS 
     show: false, 

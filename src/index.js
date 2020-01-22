@@ -5,7 +5,8 @@ import CodeEditor from './CodeEditor'
 import EditorPage from './EditorPage';
 import { Button } from 'antd';
 
-import { TitleBar } from 'electron-react-titlebar';
+// import { TitleBar } from 'electron-react-titlebar';
+import TitleBar from 'frameless-titlebar';
 import 'electron-react-titlebar/assets/style.css';
 
 import './index.css';
@@ -73,15 +74,14 @@ import 'codemirror/mode/php/php.js';
 
 class App extends Component {
     render() {
-       
+
         return (
             <>
-                <TitleBar />
+                {/* <TitleBar app="M-Editor" title="M-Editor"/> */}
                 <EditorPage />
             </>
-        ); 
+        );
     }
 }
 ReactDOM.render(<App />, document.getElementById('root'));
 
-  

@@ -25,13 +25,22 @@ body, html, #root {
 
 }
 
+/* .CodeMirror-gutter .CodeMirror-linenumbers {
+  z-index: -1 !important;
+} */
+
+.Pane.vertical.Pane2  {
+  overflow: auto !important;
+}
 
 
 .CodeMirror {
 
-  height: 100%;
-  max-width: 100%;
-  overflow: auto !important; 
+  height: 100% !important;
+  /* max-width: 100vw !important; */
+  /* min-width: 100% !important; */
+  
+  overflow: scroll !important;  
 
 
     /* margin: 0;
