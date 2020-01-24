@@ -232,7 +232,7 @@ export default class EditorPage extends Component {
       <> 
 
       {this.state.file_tree.length > 0 &&
-        <CommandPalette commands={this.commands} closeOnSelect={true} /> 
+        <CommandPalette commands={this.commands} closeOnSelect={true} hotKeys={['command+shift+p', 'ctrl+shift+p']}/> 
         }
 
         <div className="container">
