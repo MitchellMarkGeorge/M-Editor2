@@ -104,10 +104,10 @@ body, html, #root {
     /* font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace !important; */
 }
 
-/* ::-webkit-scrollbar {
+::-webkit-scrollbar {
    
     display: none;
-  } */
+  }
 
   /* for Split Pane */
 
