@@ -25,6 +25,24 @@ body, html, #root {
 
 }
 
+.ant-notification-notice-message {
+  color: #c1c1c2 !important; 
+}
+
+.react-command-palette {
+  display: none !important;
+}
+
+.ant-notification-notice-description {
+  color: #c1c1c2 !important; 
+}
+
+.ant-notification-notice-close {
+  color: #c1c1c2 !important; 
+}
+
+
+
 /* .CodeMirror-gutter .CodeMirror-linenumbers {
   z-index: -1 !important;
 } */
@@ -33,6 +51,18 @@ body, html, #root {
   overflow: auto !important;
 }
 
+/* .ant-tree-node-content-wrapper .ant-tree-node-content-wrapper-normal::before:hover {
+  color: black !important;
+} */
+
+.ant-tree.ant-tree-directory > li span.ant-tree-node-content-wrapper:hover::before, .ant-tree.ant-tree-directory .ant-tree-child-tree > li span.ant-tree-node-content-wrapper:hover::before {
+  background-color: #42474d !important; 
+}
+
+.ant-tree.ant-tree-directory > li.ant-tree-treenode-selected > span.ant-tree-node-content-wrapper::before, .ant-tree.ant-tree-directory .ant-tree-child-tree > li.ant-tree-treenode-selected > span.ant-tree-node-content-wrapper::before {
+  background-color: #42474d !important; 
+  /* used to be a bright blue */
+}
 
 .CodeMirror {
 
@@ -40,7 +70,8 @@ body, html, #root {
   /* max-width: 100vw !important; */
   /* min-width: 100% !important; */
   
-  overflow: scroll !important;  
+  overflow: scroll !important;
+  /* padding-right: 5px !important;   */
 
 
     /* margin: 0;
@@ -73,10 +104,10 @@ body, html, #root {
     /* font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace !important; */
 }
 
-::-webkit-scrollbar {
-    /* width: 0px;   */
+/* ::-webkit-scrollbar {
+   
     display: none;
-  }
+  } */
 
   /* for Split Pane */
 
@@ -96,6 +127,10 @@ body, html, #root {
     background-clip: padding-box;
   }
 
-.row {
+  * {
+    box-sizing: border-box;
+  }
+
+/* .row {
   height: calc(100% - 25px - 28px) !important;
-}
+} */

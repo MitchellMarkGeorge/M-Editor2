@@ -1,8 +1,8 @@
-const { app, BrowserWindow, Menu , ipcMain, dialog} = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 
 const path = require('path');
 const isDev = require('electron-is-dev');
-const { GET_PROJECT_PATH, RECEIVED_PROJECT_PATH} = require('./utils/constants');
+const { GET_PROJECT_PATH, RECEIVED_PROJECT_PATH } = require('./utils/constants');
 // const FileTree = require('./src/Filetree').FileTree;
 const os = require('os')
 
@@ -36,53 +36,74 @@ function createWindow() {
     height: 700,
     minWidth: 450,
     minHeight: 350,
-    title: 'M-Editor',
+    // title: 'M-Editor',
     backgroundColor: '#2c2f33',
     // frame: false,
     // titleBarStyle: 'hidden',
     // might make frameless
     //titleBarStyle: 'hidden', // 'hidden-inset' - "removes" titlebar on MacOS 
-    show: false, 
+    show: false,
     webPreferences: {
-        nodeIntegration: true // MUST ALWAYS BE TRUE
-      }});
+      nodeIntegration: true // MUST ALWAYS BE TRUE
+    }
+  });
   mainWindow.loadURL(isDev ? 'http://localhost:8080' : `file://${path.join(__dirname, '../index.html')}`);// make sure webpack builds to "build folder"
-//   if (isDev) { build/index.html
-//     // Open the DevTools.
-//     //BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
-//     mainWindow.webContents.openDevTools();
-//   }
+  //   if (isDev) { build/index.html
+  //     // Open the DevTools.
+  //     //BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
+  //     mainWindow.webContents.openDevTools();
+  //   }
   mainWindow.on('closed', () => mainWindow = null);
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
-});
+  });
+
+  mainWindow.on('close', (e) => {
+    let choice = dialog.showMessageBox(
+      {
+        type: 'question',
+        buttons: ['No', 'Yes'],
+        title: 'Confirm',
+        message: 'Are you sure you want to quit? You might have some unsaved changed.'
+      });
+
+      choice.then(result => {
+        console.log(result)
+        if (result.response == 0) {
+          e.preventDefault();
+        }
+
+        
+      });
+   
+  })
 }
 
 ipcMain.on(GET_PROJECT_PATH, (event, arg) => {
   console.log('open file dialog');
-  dialog.showOpenDialog(mainWindow, {title: 'Choose Project', defaultPath: os.homedir(), properties: ['openDirectory', 'showHiddenFiles', 'createDirectory', 'promptToCreate']})
-  .then((result) => {
-    if (result.canceled || result.filePaths[0] === os.homedir() || result.filePaths.length === 0){ // althoug the filepath will not be 0
-      console.log('CANCELED!!')
-      return;
-    } else {
-      let filepath = result.filePaths;
-      mainWindow.webContents.send(RECEIVED_PROJECT_PATH, filepath)
-      // let file_tree = new FileTree(filepath, path.basename(filepath));
-      // file_tree.build();
-      // console.log(filepath);
-    }
-  }).catch(err => {
-    console.error(err);
-  })
+  dialog.showOpenDialog(mainWindow, { title: 'Choose Project', defaultPath: os.homedir(), properties: ['openDirectory', 'showHiddenFiles', 'createDirectory', 'promptToCreate'] })
+    .then((result) => {
+      if (result.canceled || result.filePaths[0] === os.homedir() || result.filePaths.length === 0) { // althoug the filepath will not be 0
+        console.log('CANCELED!!')
+        return;
+      } else {
+        let filepath = result.filePaths;
+        mainWindow.webContents.send(RECEIVED_PROJECT_PATH, filepath)
+        // let file_tree = new FileTree(filepath, path.basename(filepath));
+        // file_tree.build();
+        // console.log(filepath);
+      }
+    }).catch(err => {
+      console.error(err);
+    })
 })
 
 
 // const dockMenu = Menu.buildFromTemplate([
 //     {
 //         label: 'New Window',
-        
+
 //     }, {
 //         label: 'New Window with Settings',
 //         submenu: [
@@ -107,6 +128,6 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
 
-    
+
   }
 });

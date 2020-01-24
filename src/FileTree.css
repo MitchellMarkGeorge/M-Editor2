@@ -1,6 +1,7 @@
 .file-tree {
     height: 100% !important;
     width: 100% !important;
+    overflow: auto !important;
     
     
     background-color:  #2c2f33;
@@ -14,18 +15,28 @@
     /* font-size: 13px; */
 }
 
+.file-icons {
+    margin-right: 3px;
+}
 .file-tree-bar {
     height: 30px; 
+    /* width: 100%; */
+    /* margin-bottom: 10px; */
     line-height: 30px;
-    white-space: nowrap;
+    /* white-space: nowrap; */
   background-color: #23272a; 
     text-align: center;
     font-weight: bold;
+    /* position: fixed;
+    top: 0; */
+    top: 0;
+    z-index: 2;
+    position: sticky;
     /* need line-heigt to be the same as height to center vertically*/
 }
 
 .tree {
-    color: #fff !important;
+    color: #c1c1c2 !important;
     overflow: auto !important;
     height: 100%;
     /* padding: 5px; */
@@ -41,7 +52,7 @@
 }
 
 .ant-tree-title:hover {
-    background: none !important;
+    background: none !important; 
 }
 
 

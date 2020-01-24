@@ -5,7 +5,7 @@
 
 // import * as os from 'os';
 
-// import * as code from 'codemirror';
+import * as code from 'codemirror';
 
 // // const fs = require('fs');
 // // const path_os = require('path');
@@ -71,7 +71,7 @@
 //   static readDir(path) {
 //     let fileArray = [];
 
-    
+
 
 //     let inital_array = fs.readdirSync(path);
 //     // console.log(inital_array);
@@ -102,8 +102,8 @@
 //       this.removeItem(inital_array, '.vscode');
 //     }
 
-    
-	
+
+
 // 	if (inital_array.includes('.DS_Store')) {
 // 	  this.removeItem(inital_array, '.DS_Store');
 // 	}
@@ -124,9 +124,9 @@
 //           //console.log('Folder');
 //           file_info.selectable = false;
 //           file_info.key = file_info.path
-          
+
 //           file_info.children = Filetree2.readDir(file_info.path);
-          
+
 
 //         } else if (stat.isFile()) {
 
@@ -136,7 +136,7 @@
 //           file_info.selectable = true;
 //           file_info.key = file_info.path;
 //           // i could also use label (i can have some files with the same name)
-          
+
 
 
 //           fs.readFile(file_path, (err, file) => {
@@ -144,7 +144,7 @@
 //             let text = file.toString();
 //             file_info.mode = code.findModeByFileName(file_info.title);
 //             file_info.document = code.Doc(text, file_info.mode);
-            
+
 //             // code.modeURL = "node_modules/codemirror/mode/%N/%N.js"
 //             // code.requireMode(file_info.mode.mode, () => {
 //             //   console.log("done! mode loaded");
@@ -155,7 +155,7 @@
 
 //           }
 
-          
+
 
 //         });
 
@@ -198,7 +198,7 @@
 
 //     });
 
-   
+
 
 //     return fileArray;
 //   }
@@ -230,15 +230,15 @@ import path from 'path';
 
 export default function walk(dir, callback) {
   var results = {
-        "path": dir,
-        "title": path.basename(dir),
-        "isLeaf": false, 
-        "children": [],
-        "selectable": false
-        
-        
-      };
-  fs.readdir(dir, function(err, list) {
+    "path": dir,
+    "title": path.basename(dir),
+    "isLeaf": false,
+    "children": [],
+    "selectable": false
+
+
+  };
+  fs.readdir(dir, function (err, list) {
     if (err) { return callback(err); }
 
     if (list.length === 0) {
@@ -267,24 +267,39 @@ export default function walk(dir, callback) {
     }
     var pending = list.length;
     if (!pending) { return callback(null, results); }
-    list.forEach(function(file) {
-      fs.stat(dir + '/' + file, function(err, stat) {
+    list.forEach(function (file) {
+      fs.stat(dir + '/' + file, function (err, stat) {
         if (stat && stat.isDirectory()) { //path.resolve
-          walk(dir + '/' + file, function(err, res) {
+          walk(dir + '/' + file, function (err, res) {
             // results.title = path.basename(results.path); // might handle err here
             // results.isLeaf = false;
-            results.children.push(res); 
-            
-            if (!--pending){ callback(null, results); }
+            results.children.push(res);
+
+            if (!--pending) { callback(null, results); }
           });
         } else {
+          let text = fs.readFileSync(dir + "/" + file).toString();
+          let mode = code.findModeByFileName(file);
+          let document = code.Doc(text, mode);
 
-         let file_obj = { // path.resoleve
-        "path": dir + "/" + file, 
-         "isLeaf": true, 
-         "title": file, 
-         
-        }
+          let file_obj = {
+            "path": dir + "/" + file, 
+            "mode": mode,
+            "document": document,
+            "isLeaf": true,
+            "title": file,
+            "saved": true
+          }
+          
+          // file_obj.mode = code.findModeByFileName(file);
+          // file_info.document = code.Doc(text, file_obj.mode);
+
+          // let file_obj = { // path.resoleve
+          //   "path": dir + "/" + file,
+          //   "isLeaf": true,
+          //   "title": file,
+
+          // }
           // results.isLeaf = true;
           // results.title = results.path;
           results.children.push(file_obj);
@@ -295,7 +310,7 @@ export default function walk(dir, callback) {
   });
 };
 
-function removeItem (arr, item) {
+function removeItem(arr, item) {
   let index = arr.indexOf(item);
 
   if (index !== -1) {

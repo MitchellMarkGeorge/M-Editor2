@@ -4,9 +4,10 @@ import * as electron from 'electron';
 import CodeEditor from './CodeEditor'
 import EditorPage from './EditorPage';
 import { Button } from 'antd';
+import { Menu, MenuItem } from 'electron';
 
 // import { TitleBar } from 'electron-react-titlebar';
-import TitleBar from 'frameless-titlebar';
+// import TitleBar from 'frameless-titlebar';
 import 'electron-react-titlebar/assets/style.css';
 
 import './index.css';
@@ -66,6 +67,8 @@ import 'codemirror/mode/jsx/jsx.js';
 import 'codemirror/mode/php/php.js';
 
 
+import { Titlebar, Color } from 'custom-electron-titlebar'
+
 
 
 
@@ -83,5 +86,11 @@ class App extends Component {
         );
     }
 }
+//  new Titlebar({
+//     backgroundColor: Color.fromHex('#fff'),
+//     shadow: true
+// });
+
+
 ReactDOM.render(<App />, document.getElementById('root'));
 
