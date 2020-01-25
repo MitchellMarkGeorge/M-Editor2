@@ -11,7 +11,7 @@ import 'codemirror-colorpicker'
 import './CodeEditor.css';
 
 
-
+import Moustrap from 'mousetrap';
 
 
 
@@ -31,6 +31,10 @@ export default class CodeEditor extends Component {
             currentFile: undefined
         };
 
+        Moustrap.bind(['ctrl+s', 'command+s'], () => {
+            this.saveFile();
+        })
+
 
 
 
@@ -43,6 +47,27 @@ export default class CodeEditor extends Component {
         this.editor = ref;
     }
 
+    swapDoc = () => {
+        if (this.state.currentFile) {
+            console.log(this.state.currentFile.props);
+            let object = this.state.currentFile.props;
+            this.codeEditor.swapDoc(object.document);
+            // if (!object.saved) {
+            //     this.props.setFileName(`${object.title} (Unsaved)`);
+            //   } else{
+            //     this.props.setFileName(object.title);
+            //   }
+            //   if (object.mode){
+            //     this.props.setFileLang(object.mode.name);
+            //   } else {
+            //     this.props.setFileLang('Plain Text'); // Language is undefined??? None??? Lang not supported
+            //   }
+            this.codeEditor.setOption('mode', object.mode?.mime);
+            this.codeEditor.setOption('mode', this.codeEditor.getOption('mode'));
+            //console.log(this.state.currentFile.props);
+        }
+    }
+
     showNotification = (message, description, type) => {
         notification[type]({
             message: message,
@@ -52,7 +77,7 @@ export default class CodeEditor extends Component {
             className: 'notification',
             style: {
                 backgroundColor: '#23272a',
-                color: 'white'
+                // color: 'white'
             }
 
         });
@@ -141,6 +166,27 @@ export default class CodeEditor extends Component {
             } // think about theme
         })
 
+        this.swapDoc()
+
+        // if (this.state.currentFile) {
+        //     console.log(this.state.currentFile.props);
+        //     let object = this.state.currentFile.props;
+        //     this.codeEditor.swapDoc(object.document);
+        //     // if (!object.saved) {
+        //     //     this.props.setFileName(`${object.title} (Unsaved)`);
+        //     //   } else{
+        //     //     this.props.setFileName(object.title);
+        //     //   }
+        //     //   if (object.mode){
+        //     //     this.props.setFileLang(object.mode.name);
+        //     //   } else {
+        //     //     this.props.setFileLang('Plain Text'); // Language is undefined??? None??? Lang not supported
+        //     //   }
+        //     this.codeEditor.setOption('mode', object.mode?.mime);
+        //     this.codeEditor.setOption('mode', this.codeEditor.getOption('mode'));
+        //     //console.log(this.state.currentFile.props);
+        // }
+
 
     }
 
@@ -149,24 +195,25 @@ export default class CodeEditor extends Component {
         // setFileName
         // swap doc
         //console.log(this.state.currentFile.props);
-        if (this.state.currentFile) {
-            console.log(this.state.currentFile.props);
-            let object = this.state.currentFile.props;
-            this.codeEditor.swapDoc(object.document);
-            // if (!object.saved) {
-            //     this.props.setFileName(`${object.title} (Unsaved)`);
-            //   } else{
-            //     this.props.setFileName(object.title);
-            //   }
-            //   if (object.mode){
-            //     this.props.setFileLang(object.mode.name);
-            //   } else {
-            //     this.props.setFileLang('Plain Text'); // Language is undefined??? None??? Lang not supported
-            //   }
-            this.codeEditor.setOption('mode', object.mode?.mime);
-            this.codeEditor.setOption('mode', this.codeEditor.getOption('mode'));
-            //console.log(this.state.currentFile.props);
-        }
+        this.swapDoc();
+        // if (this.state.currentFile) {
+        //     console.log(this.state.currentFile.props);
+        //     let object = this.state.currentFile.props;
+        //     this.codeEditor.swapDoc(object.document);
+        //     // if (!object.saved) {
+        //     //     this.props.setFileName(`${object.title} (Unsaved)`);
+        //     //   } else{
+        //     //     this.props.setFileName(object.title);
+        //     //   }
+        //     //   if (object.mode){
+        //     //     this.props.setFileLang(object.mode.name);
+        //     //   } else {
+        //     //     this.props.setFileLang('Plain Text'); // Language is undefined??? None??? Lang not supported
+        //     //   }
+        //     this.codeEditor.setOption('mode', object.mode?.mime);
+        //     this.codeEditor.setOption('mode', this.codeEditor.getOption('mode'));
+        //     //console.log(this.state.currentFile.props);
+        // }
     }
 
 

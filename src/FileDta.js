@@ -1,7 +1,7 @@
 
 // import * as fs from 'fs';
 
-// import * as path_os from 'path';
+ import * as path_os from 'path';
 
 // import * as os from 'os';
 
@@ -278,17 +278,23 @@ export default function walk(dir, callback) {
             if (!--pending) { callback(null, results); }
           });
         } else {
+          // let path = path_os.resolve(dir, file);
           let text = fs.readFileSync(dir + "/" + file).toString();
           let mode = code.findModeByFileName(file);
           let document = code.Doc(text, mode);
 
+          
+
           let file_obj = {
+
+            
             "path": dir + "/" + file, 
             "mode": mode,
             "document": document,
             "isLeaf": true,
             "title": file,
-            "saved": true
+            "saved": true, 
+            // "key": dir + "/" + file
           }
           
           // file_obj.mode = code.findModeByFileName(file);

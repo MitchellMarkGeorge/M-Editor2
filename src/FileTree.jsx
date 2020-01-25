@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { } from 'antd';
-import { Button, Tree, Icon } from 'antd';
+
+import { Button, Tree } from 'antd';
 
 import './FileTree.css'
 
@@ -45,7 +45,7 @@ export default class Filetree extends Component {
                 {this.props.file_tree.length > 0 &&
                     <div >
                         {/* style={{overflow: 'auto', height: '100%'}} */}
-                        <DirectoryTree className="tree" treeData={this.props.file_tree} multiple defaultExpandAll onSelect={this.onSelect} onExpand={this.onExpand}>
+                        <DirectoryTree className="tree" treeData={this.props.file_tree} onSelect={this.onSelect} onExpand={this.onExpand}>
 
                             {/* the keys will be the path of the file */}
                             {/* <TreeNode title="parent 0" key="0-0">
