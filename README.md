@@ -13,4 +13,4 @@ M-Editor is a revolutionary text editor that supports multiple languages and has
 More features to come!!!
 
 ![Image of M-Editor]
-(public/M-Editor Picture.png)
+(M-Editor_Picture.png)
