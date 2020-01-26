@@ -82,7 +82,7 @@ body, html, #root {
 
 .CodeMirror {
 
-  font-size: 12px;
+  /* font-size: 12px; */
 
   font-family: Menlo, Monaco, 'Courier New', monospace !important;
 

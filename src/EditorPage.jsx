@@ -529,12 +529,14 @@ export default class EditorPage extends Component {
           style={{
             position: "relative",
             height: "100%",
-            backgroundColor: "#14171d"
+            // backgroundColor: "#14171d"
+            backgroundColor: '#212121'
           }}
         >
           <Empty
             className="no-selected-file"
-            description={<span>Nothing to see here. (Not final color)</span>}
+            // image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={<span>Nothing to see here. </span>}
           />
         </div>
       );
