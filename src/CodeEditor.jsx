@@ -49,9 +49,10 @@ export default class CodeEditor extends Component {
 
     swapDoc = () => {
         if (this.state.currentFile) {
-            console.log(this.state.currentFile.props);
+            console.log(this.state.currentFile.props); 
             let object = this.state.currentFile.props;
-            this.codeEditor.swapDoc(object.document);
+            if (object.document.cm) {console.log(object.document.cm); object.document.cm = null;} // why was this giving an eror
+            this.codeEditor.swapDoc(object.document);  
             // if (!object.saved) {
             //     this.props.setFileName(`${object.title} (Unsaved)`);
             //   } else{
@@ -68,7 +69,7 @@ export default class CodeEditor extends Component {
         }
     }
 
-    showNotification = (message, description, type) => {
+    showNotification = (message, description, type) => { 
         notification[type]({
             message: message,
             // duration: 0,
@@ -120,7 +121,7 @@ export default class CodeEditor extends Component {
         // Any time the current user changes,
         // Reset any parts of state that are tied to that user.
         // In this simple example, that's just the email.
-        if (props?.currentFile?.props?.title !== state?.currentFile?.props?.title) {
+        if (props?.currentFile?.props?.path !== state?.currentFile?.props?.path) {
             return {
                 currentFile: props.currentFile,
             };
@@ -137,7 +138,7 @@ export default class CodeEditor extends Component {
         codemirror.commands.autocomplete = function (cm) {
             cm.showHint({ hint: codemirror.hint.anyword });
         };
-
+        console.log('here')
         //  FIGURE OUT EDITOR THEME
         this.codeEditor = codemirror(this.editor, {
             // value: "function myScript(){return 100;}\n",
@@ -195,6 +196,7 @@ export default class CodeEditor extends Component {
         // setFileName
         // swap doc
         //console.log(this.state.currentFile.props);
+        this.codeEditor.refresh(); 
         this.swapDoc();
         // if (this.state.currentFile) {
         //     console.log(this.state.currentFile.props);

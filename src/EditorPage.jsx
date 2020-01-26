@@ -449,6 +449,7 @@ export default class EditorPage extends Component {
   onClick = (keys, event) => {
     //console.log(event);
     let object = event.node.props;
+    if (object.path === this.state?.currentFile?.props?.path) return;
     // let lang = object.mode ? object.mode.name : "Plain Text";
     let lang;
 
@@ -457,7 +458,7 @@ export default class EditorPage extends Component {
     } else if (object.isImage) {
       lang = 'Image'
     } else {
-      "Plain Text"
+      lang = "Plain Text"
     }
     // if (object.mode) {
 
@@ -506,7 +507,7 @@ export default class EditorPage extends Component {
     // this.state.file_tree && this.state.file_tree.length
     if (this.state.currentFile) {
 
-      if (this.state.currentFile.props.isImage) {
+      if (this.state.currentFile.props.isImage && this.state.currentFile.props.base64) {
         View = (
           <ImageViewer path={this.state.currentFile.props.base64} />
         )
@@ -518,7 +519,7 @@ export default class EditorPage extends Component {
             openFiles={this.state.openFiles}
             currentFile={this.state.currentFile}
             showNotification={this.showNotification}
-            showModal={this.showModal}
+            showModal={this.showModal} 
           />
         );
       }
