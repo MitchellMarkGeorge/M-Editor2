@@ -196,7 +196,7 @@ export default class CodeEditor extends Component {
         // setFileName
         // swap doc
         //console.log(this.state.currentFile.props);
-        this.codeEditor.refresh(); 
+        // this.codeEditor.refresh();
         this.swapDoc();
         // if (this.state.currentFile) {
         //     console.log(this.state.currentFile.props);
