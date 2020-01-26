@@ -8,7 +8,7 @@ M-Editor is a revolutionary text editor that supports multiple languages and has
 * Color Picker
 * Image Viewer
 * File Tree
-* --Autocomplete--
+* ~~Autocomplete~~
 
 More features to come!!!
 
