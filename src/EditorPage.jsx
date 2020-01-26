@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import CodeEditor from "./CodeEditor";
+import ImageViewer from './ImageViewer';
 import FileTree from "./FileTree";
 import SplitPane from "react-split-pane";
 import { ipcRenderer } from "electron";
@@ -11,6 +12,7 @@ import { remote } from "electron";
 import * as os from "os";
 import * as fs from "fs";
 import * as git from "simple-git";
+import * as path_os from 'path';
 import * as child_proccess from "child_process";
 
 const { dialog } = remote;
@@ -22,9 +24,9 @@ import { GET_PROJECT_PATH, RECEIVED_PROJECT_PATH } from "../utils/constants";
 import "./EditorPage.css";
 
 // TODO:
-// - Clear editor on project change
+// - Git status and icon
 // - Checking git repo on change project
-//
+// - Image
 
 export default class EditorPage extends Component {
   // currrentFileName = "Welcome. Select a file to begin.";
@@ -35,23 +37,11 @@ export default class EditorPage extends Component {
   //   modal: 'palette-overlay'
   // }
 
+
+
   constructor(props) {
     super(props);
 
-    
-    this.state = {
-      file_tree: [],
-      openFiles: [],
-      currentFile: undefined,
-      projectPath: "",
-      visible: false,
-      currrentFileName: "Welcome. Select a file to begin.",
-      currentFileLang: ""
-      
-      // might have currrentFileName and CurrentFileLang but it might all be in the curent file object
-    };
-
-    // this.state = this.initalState;
     this.initalcommands = [
       //Open Terminal
       {
@@ -87,10 +77,37 @@ export default class EditorPage extends Component {
         command: () => {
           this.openTerminal();
         }
-      }
-    ];
+      },
 
-    this.commands = this.initalcommands;
+      // {
+      //   name: 'Git Init',  // should i still use this???
+      //   command: () => {
+      //     this.initalizeGit();
+      //     this.refreshFileTree();
+      //     this.addGitCommands();
+      //   }
+      // }
+    ];
+    this.state = {
+      file_tree: [],
+      openFiles: [],
+      currentFile: undefined,
+      projectPath: "",
+      hasGitRepo: false,
+      currrentFileName: "Welcome. Select a file to begin.",
+      currentFileLang: "",
+      commands: this.initalcommands
+      // might have currrentFileName and CurrentFileLang but it might all be in the curent file object
+    };
+
+    //   this.commands;
+    // this.initalcommands = 
+
+    // this.state = this.initalState;
+
+
+    // this.commands = this.copy(this.initalcommands);
+    // console.log(this.initalcommands)
   }
 
   // componentDidUpdate(prevState){
@@ -112,7 +129,7 @@ export default class EditorPage extends Component {
   //           this.showNotification("File Tree refreshed", null, "success");
   //         }
   //       },
-  
+
   //       {
   //         name: "Choose Project",
   //         // category: 'Editor',
@@ -124,7 +141,7 @@ export default class EditorPage extends Component {
   //           // this.setFileLang("");
   //         }
   //       },
-  
+
   //       {
   //         name: "Open Terminal",
   //         command: () => {
@@ -143,6 +160,21 @@ export default class EditorPage extends Component {
       visible: true
     });
   };
+
+  copy = (aObject) => {
+    if (!aObject) {
+      return aObject;
+    }
+
+    let v;
+    let bObject = Array.isArray(aObject) ? [] : {};
+    for (const k in aObject) {
+      v = aObject[k];
+      bObject[k] = (typeof v === "object") ? this.copy(v) : v;
+    }
+
+    return bObject;
+  }
 
   openTerminal = () => {
     if (os.platform() == "darwin") {
@@ -189,20 +221,23 @@ export default class EditorPage extends Component {
           // handle error
           console.log(result);
           if (newProject) {
-            this.setState({ file_tree: [result], projectPath: project_path, currentFile: undefined, currentFileLang: "", currrentFileName: "Welcome. Select a file to begin."})
-            this.commands = this.initalcommands;
-            console.log(this.initalcommands);
-            console.log(this.commands)
-            console.log('Reset')
+            document.body.style.cursor = 'default';
+            this.setState({ file_tree: [result], projectPath: project_path, currentFile: undefined, currentFileLang: "", currrentFileName: "Welcome. Select a file to begin.", commands: this.initalcommands, hasGitRepo: false })
+            // this.commands = this.copy(this.initalcommands);
+            // console.log(this.initalcommands);
+            // console.log(this.commands)
+            // console.log('Reset')
             this.addGitCommands();
           } else {
             this.setState({ file_tree: [result], projectPath: project_path });
             //this.commands = this.initalcommands;
             //this.addGitCommands();
-            
+
           }
-          
-          
+
+
+
+
         } else if (err) {
           this.showNotification(
             `Error in loading ${project_path}`,
@@ -227,7 +262,7 @@ export default class EditorPage extends Component {
           fs.writeFile(result.filePath, "", err => {
             if (err) return;
             this.showNotification(
-              `New file ${result.filePath} made`,
+              `New file ${path_os.basename(result.filePath)} made`,
               null,
               "success"
             );
@@ -267,7 +302,7 @@ export default class EditorPage extends Component {
       if (err)
         this.showNotification("Unable to add files", "Try again.", "error");
       else {
-        this.showNotification("Added all files to git", null, "success");
+        this.showNotification("Added all files to Git", null, "success");
       }
       //ADD SUCCESS MESSAGE
     });
@@ -278,7 +313,7 @@ export default class EditorPage extends Component {
       if (err)
         this.showNotification("Unable to commit files", "Try again.", "error");
       else {
-        this.showNotification("Commited all files to git", null, "success");
+        this.showNotification("Commited all files to Git", null, "success");
       }
     });
   };
@@ -287,86 +322,84 @@ export default class EditorPage extends Component {
     git(this.state.projectPath).pull(err => {
       if (err)
         this.showNotification(
-          "Unable to pull files from git",
+          "Unable to pull files from Git",
           "Try again",
           "error"
         );
       else {
         this.refreshFileTree();
-        this.showNotification("Pulled files from git", null, "success");
+        this.showNotification("Pulled files from Git", null, "success");
       }
     });
   };
 
-  initalizeGit = () => {
-    git(this.state.projectPath).init(false, err => {
-      if (err)
-        this.showNotification(
-          "Unable to initalize git repository",
-          "Try again.",
-          "error"
-        );
-      else {
-        this.showNotification("Initalized new git repository", null, "success");
-      }
-    });
-  };
+  // initalizeGit = () => {
+  //   git(this.state.projectPath).init(false, err => {
+  //     if (err)
+  //       this.showNotification(
+  //         "Unable to initalize Git repository",
+  //         "Try again.",
+  //         "error"
+  //       );
+  //     else {
+  //       this.showNotification("Initalized new Git repository", null, "success");
+  //     }
+  //   });
+  // };
 
   addGitCommands = () => {
-    
+
     if (this.state.projectPath) {
       git(this.state.projectPath).checkIsRepo((err, isRepo) => {
         //console.log(isRepo);
+        let newArray;
         if (isRepo) {
+          this.setState({ hasGitRepo: true })
           //this.hasGitRepo = true;
 
           //console.log('working')
-          this.commands.push(
-            {
-              name: "Git Add All Files",
-              // category: 'Git',
-              command: () => {
-                this.addAll();
-              }
-            },
 
-            {
-              name: "Git Commit (with Defult Message)",
-              // category: 'Git',
-              command: () => {
-                this.commitFiles();
-              }
-            },
-
-            {
-              name: "Git Pull",
-              command: () => {
-                this.pullRepo();
-              }
+          newArray = [...this.state.commands, {
+            name: "Git Add All Files",
+            // category: 'Git',
+            command: () => {
+              this.addAll();
             }
-          );
+          },
+
+          {
+            name: "Git Commit (with Defult Message)",
+            // category: 'Git',
+            command: () => {
+              this.commitFiles();
+            }
+          },
+
+          {
+            name: "Git Pull",
+            command: () => {
+              this.pullRepo();
+            }
+          }]
+
+          this.setState({ commands: newArray })
+          // this.commands.push(
+
+          // );
           //console.log(this.commands);
         } else if (err) {
           this.showNotification(
-            "Unable to check git repo",
-            "Check that you have git installed",
+            "Unable to check Git repo",
+            "Check that you have Git installed",
             "error"
           );
-        } else {
-          this.commands.push({
-            name: "Git Initalize",
-            // category: 'Git',
-            command: () => {
-              this.initalizeGit();
-            }
-          });
         }
       });
     }
   };
 
   componentDidMount() {
-   
+
     // git(this.state.projectPath).push()
 
     // ipcRenderer.on(RECEIVED_PROJECT_PATH, (event, arg) => {
@@ -392,9 +425,9 @@ export default class EditorPage extends Component {
     // });
     //console.log(this.hasGitRepo);
 
-    
-      this.loadProject(true);
-    
+
+    this.loadProject(true);
+
     //this.getIcon();
   }
 
@@ -416,14 +449,23 @@ export default class EditorPage extends Component {
   onClick = (keys, event) => {
     //console.log(event);
     let object = event.node.props;
-    let lang  = object.mode? object.mode.name: "Plain Text"
+    // let lang = object.mode ? object.mode.name : "Plain Text";
+    let lang;
+
+    if (object.mode) {
+      lang = object.mode.name;
+    } else if (object.isImage) {
+      lang = 'Image'
+    } else {
+      "Plain Text"
+    }
     // if (object.mode) {
 
     // }
-    this.setState({ currentFile: event.node, currrentFileName: object.title, currentFileLang: lang});
+    this.setState({ currentFile: event.node, currrentFileName: object.title, currentFileLang: lang });
     console.log(`clicked ${event.node.props.title}`);
     //console.log(this.state.currentFile);
-    
+
     // if (!object.saved) {
     //   this.setFileName(`${object.title} (Unsaved)`);
     // } else {
@@ -438,6 +480,7 @@ export default class EditorPage extends Component {
 
   getPath = () => {
     ipcRenderer.send(GET_PROJECT_PATH, "");
+    document.body.style.cursor = 'wait';
   };
 
   getFileObject(element, file_path) {
@@ -462,16 +505,23 @@ export default class EditorPage extends Component {
     // add if no files are opened???
     // this.state.file_tree && this.state.file_tree.length
     if (this.state.currentFile) {
-      View = (
-        <CodeEditor
-          setFileName={this.setFileName}
-          setFileLang={this.setFileLang}
-          openFiles={this.state.openFiles}
-          currentFile={this.state.currentFile}
-          showNotification={this.showNotification}
-          showModal={this.showModal}
-        />
-      );
+
+      if (this.state.currentFile.props.isImage) {
+        View = (
+          <ImageViewer path={this.state.currentFile.props.base64} />
+        )
+      } else {
+        View = (
+          <CodeEditor
+            setFileName={this.setFileName}
+            setFileLang={this.setFileLang}
+            openFiles={this.state.openFiles}
+            currentFile={this.state.currentFile}
+            showNotification={this.showNotification}
+            showModal={this.showModal}
+          />
+        );
+      }
     } else {
       View = (
         <div
@@ -492,62 +542,41 @@ export default class EditorPage extends Component {
     return View;
   };
 
-  getIcon = () => {
-    let icon;
 
-    if (this.state.file_tree && this.state.file_tree.length > 0) {
-      if (!this.hasGitRepo) {
-        console.log(this.hasGitRepo);
-        icon = "api";
-      } else {
-        icon = "branches";
-      }
-    } else {
-      icon = "smile";
-    }
-
-    return icon;
-  };
 
   render() {
     return (
       <>
         {this.state.file_tree.length > 0 && (
           <CommandPalette
-            commands={this.commands}
+            commands={this.state.commands}
             closeOnSelect={true}
             hotKeys={["command+shift+p", "ctrl+shift+p"]}
             resetInputOnClose={true}
             placeholder="Enter a command"
-            options={{
-              keys: [
-                "name"
-                // 'category'
-              ]
-            }}
           />
         )}
 
         <div className="container">
           {/* remove min size */}
           <div className="inner-container">
-            <div className="inner-grid">
-              <SplitPane
-                split="vertical"
-                defaultSize={280}
-                maxSize={350}
-                minSize={0}
-              >
-                {/* set max value */}
-                <FileTree
-                  file_tree={this.state.file_tree}
-                  getPath={this.getPath}
-                  onClick={this.onClick}
-                />
-                {this.getView()}
-                {/* <CodeEditor currrentFileName={this.state.currrentFileName} currentFileLang={this.state.currentFileLang} openFiles={this.state.openFiles} currentFile={this.state.currentFile} /> */}
-              </SplitPane>
-            </div>
+            {/* <div className="inner-grid"> */}
+            <SplitPane
+              split="vertical"
+              defaultSize={280}
+              maxSize={350}
+              minSize={0}
+            >
+              {/* set max value */}
+              <FileTree
+                file_tree={this.state.file_tree}
+                getPath={this.getPath}
+                onClick={this.onClick}
+              />
+              {this.getView()}
+              {/* <CodeEditor currrentFileName={this.state.currrentFileName} currentFileLang={this.state.currentFileLang} openFiles={this.state.openFiles} currentFile={this.state.currentFile} /> */}
+            </SplitPane>
+            {/* </div> */}
           </div>
 
           <div className="low-bar">
@@ -555,15 +584,24 @@ export default class EditorPage extends Component {
               {/* <Icon type={this.state.currentFile ? "api" : "smile"} /> */}
               <Icon
                 type={
-                  this.state.file_tree && this.state.file_tree.length > 0
-                    ? "api"
-                    : "smile"
+                  this.state.hasGitRepo
+                    ? 'branches' // or use 'forks'
+                    : "api"
                 }
               />
             </span>
             <span className="low-bar-text">{this.state.currrentFileName}</span>
-            <span className="low-bar-text">{this.state.currentFileLang}</span>
-            {/* <span className="low-bar-text">{thi}</span> */}
+            {this.state.currentFileLang && <span className="low-bar-text">{this.state.currentFileLang}</span>}
+
+
+
+
+            {/* {this.state.hasGitRepo &&
+
+              <span className="low-bar-text"><Icon type="branches" /></span>
+              // <span className="low-bar-text">Git</span>
+
+            } */}
           </div>
 
           {/* <Footer className="low-bar">

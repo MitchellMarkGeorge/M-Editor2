@@ -3,6 +3,10 @@
 
  import * as path_os from 'path';
 
+ import * as is_image from 'is-image';
+ import * as image_type from 'image-type';
+ 
+
 // import * as os from 'os';
 
 import * as code from 'codemirror';
@@ -279,9 +283,23 @@ export default function walk(dir, callback) {
           });
         } else {
           // let path = path_os.resolve(dir, file);
-          let text = fs.readFileSync(dir + "/" + file).toString();
+          // let text = fs.readFileSync(dir + "/" + file).toString();
+          let base64String;
+          let text = fs.readFileSync(dir + "/" + file);
           let mode = code.findModeByFileName(file);
-          let document = code.Doc(text, mode);
+          let document = code.Doc(text.toString(), mode);
+          let isImage = is_image(dir + "/" + file);
+
+          if (isImage) {
+            let imageType = image_type(text).mime;
+            let data = text.toString('base64');
+            base64String = `data:${imageType};base64,${data}`
+
+          } else { 
+            text = text.toString(); // do i actually need to?
+          }
+
+          
 
           
 
@@ -294,6 +312,9 @@ export default function walk(dir, callback) {
             "isLeaf": true,
             "title": file,
             "saved": true, 
+            "isImage": isImage, 
+            "base64": base64String
+            
             // "key": dir + "/" + file
           }
           

@@ -95,7 +95,7 @@ export default class CodeEditor extends Component {
                 }
             })
             console.log('saved file')
-            this.showNotification(`File ${this?.state?.currentFile?.props?.title} saved`, null, 'success');
+            this.showNotification(`File ${this.state.currentFile.props.title} saved`, null, 'success');
             this.state.currentFile.props.document.clearHistory()
 
         }

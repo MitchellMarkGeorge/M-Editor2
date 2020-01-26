@@ -59,12 +59,32 @@ body, html, #root {
   background-color: #42474d !important; 
 }
 
+/* .ant-tree.ant-tree-directory > li span.ant-tree-node-content-wrapper:hover::before, .ant-tree.ant-tree-directory .ant-tree-child-tree > li span.ant-tree-node-content-wrapper:hover::before {
+  background-color: transparent !important; 
+} */
+
 .ant-tree.ant-tree-directory > li.ant-tree-treenode-selected > span.ant-tree-node-content-wrapper::before, .ant-tree.ant-tree-directory .ant-tree-child-tree > li.ant-tree-treenode-selected > span.ant-tree-node-content-wrapper::before {
   background-color: #42474d !important; 
-  /* used to be a bright blue */
+  /* used to be a bright blue */ 
+}
+
+.cm-s-material-darker .CodeMirror-matchingbracket {
+  /* text-decoration: underline;
+  color: white !important; */
+  text-decoration: none !important;
+  outline:1px solid grey !important; 
+  color: white !important; 
+}
+
+.cm-s-material-darker .cm-string-2 {
+  color: #C3E88D !important;
 }
 
 .CodeMirror {
+
+  font-size: 12px;
+
+  font-family: Menlo, Monaco, 'Courier New', monospace !important;
 
   height: 100% !important;
   /* max-width: 100vw !important; */
