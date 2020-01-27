@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as codemirror from 'codemirror'
 import { notification } from 'antd';
+import { remote } from "electron";
 import * as fs from 'fs';
 // import { Empty } from 'antd';
 import 'codemirror-colorpicker/dist/codemirror-colorpicker.css'
@@ -20,17 +21,19 @@ import Moustrap from 'mousetrap';
 export default class CodeEditor extends Component {
 
     codeEditor;
-
+    menu;
     constructor(props) {
         super(props);
 
-        this.editor = null;
+        this.editor = React.createRef();
 
 
         this.state = {
             currentFile: undefined
         };
 
+
+   
         Moustrap.bind(['ctrl+s', 'command+s'], () => {
             this.saveFile();
         })
@@ -43,15 +46,16 @@ export default class CodeEditor extends Component {
 
     }
 
-    setEditor = (ref) => {
-        this.editor = ref;
-    }
+    // setEditor = (ref) => {
+    //     this.editor = ref;
+    // }
 
     swapDoc = () => {
         if (this.state.currentFile) {
             console.log(this.state.currentFile.props); 
             let object = this.state.currentFile.props;
-            if (object.document.cm) {console.log(object.document.cm); object.document.cm = null;} // why was this giving an eror
+            console.log(object.document.cm);
+            if (object.document.cm) {console.log('hello', object.document.cm); object.document.cm = null;} // why was this giving an eror
             this.codeEditor.swapDoc(object.document);  
             // if (!object.saved) {
             //     this.props.setFileName(`${object.title} (Unsaved)`);
@@ -135,12 +139,16 @@ export default class CodeEditor extends Component {
             this.saveFile();
         }
 
+
+
         codemirror.commands.autocomplete = function (cm) {
             cm.showHint({ hint: codemirror.hint.anyword });
         };
-        console.log('here')
+        
+        
+    
         //  FIGURE OUT EDITOR THEME
-        this.codeEditor = codemirror(this.editor, {
+        this.codeEditor = codemirror(this.editor.current, {
             // value: "function myScript(){return 100;}\n",
             // value: 'Welcome to M-Editor! Select a file to begin.',
             // mode:  "javascript",
@@ -166,7 +174,23 @@ export default class CodeEditor extends Component {
                 mode: 'edit'
             } // think about theme
         })
+        const menu = new remote.Menu();
+        menu.append(new remote.MenuItem({ label: 'Undo', click: () => {this.codeEditor.execCommand('undo')} }));
+        menu.append(new remote.MenuItem({ label: 'Redo', click: () => {this.codeEditor.execCommand('redo')} }));
+        menu.append(new remote.MenuItem({ label: 'Comment', click: () => {this.codeEditor.execCommand('toggleCommentIndented')} }));
+        menu.append(new remote.MenuItem({ label: 'Find', click: (e) => {console.log(e); this.codeEditor.execCommand('find')} }));
+        menu.append(new remote.MenuItem({ label: 'Select All', click: () => {this.codeEditor.execCommand('selectAll')} }));
+        menu.append(new remote.MenuItem({ label: 'Indent', click: () => {this.codeEditor.execCommand('defaultTab')} }));
+        menu.append(new remote.MenuItem({ label: 'Replace', click: () => {this.codeEditor.execCommand('replace')} }));
+        menu.append(new remote.MenuItem({ label: 'Replace All', click: () => {this.codeEditor.execCommand('replaceAll')} }));
+        menu.append(new remote.MenuItem({ type: 'separator' }));
+        menu.append(new remote.MenuItem({ label: 'Save File', click: () => {this.codeEditor.execCommand('save')} }));
+        
 
+        
+        this.menu = menu;
+
+        console.log(codemirror.commands);
         this.swapDoc()
 
         // if (this.state.currentFile) {
@@ -216,6 +240,11 @@ export default class CodeEditor extends Component {
         //     this.codeEditor.setOption('mode', this.codeEditor.getOption('mode'));
         //     //console.log(this.state.currentFile.props);
         // }
+    }
+
+    showContextMenu = (event) => {
+        event.preventDefault();
+        this.menu.popup({ window: remote.getCurrentWindow() });
     }
 
 
@@ -274,7 +303,7 @@ export default class CodeEditor extends Component {
 
         return (
             <>
-                <div className="editor-container">
+                <div className="editor-container" >
 
                     {/* {this.state.currentFile !== undefined && 
             
@@ -282,7 +311,7 @@ export default class CodeEditor extends Component {
           
             } */}
 
-                    <div className="editor" ref={this.setEditor}></div>
+                    <div className="editor" ref={this.editor} onContextMenu={this.showContextMenu}></div>
 
                     {/* {this.state.currentFile === undefined && 
             

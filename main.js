@@ -36,7 +36,7 @@ function createWindow() {
     height: 700,
     minWidth: 450,
     minHeight: 350,
-    // title: 'M-Editor',
+    title: 'M-Editor',
     backgroundColor: '#2c2f33',
     // frame: false,
     // titleBarStyle: 'hidden',

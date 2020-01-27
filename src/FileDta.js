@@ -287,7 +287,8 @@ export default function walk(dir, callback) {
           let base64String;
           let text = fs.readFileSync(dir + "/" + file);
           let mode = code.findModeByFileName(file);
-          let document = code.Doc(text.toString(), mode) 
+          // let document = code.Doc(text.toString(), mode)
+          let document;
           let isImage = is_image(dir + "/" + file);
           let imageType = image_type(text);
 
@@ -297,8 +298,8 @@ export default function walk(dir, callback) {
             base64String = `data:${imageTypeMime};base64,${data}`
 
           } else {
-            // text = text.toString(); // do i actually need to?
-            // document = code.Doc(text, mode)  
+            text = text.toString(); // do i actually need to?
+            document = code.Doc(text, mode)  
           } 
 
           

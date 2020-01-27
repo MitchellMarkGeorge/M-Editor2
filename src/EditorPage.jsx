@@ -15,7 +15,10 @@ import * as git from "simple-git";
 import * as path_os from 'path';
 import * as child_proccess from "child_process";
 
-const { dialog } = remote;
+
+const { dialog, Menu } = remote;
+
+const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
 import { Empty, notification } from "antd";
 
@@ -35,12 +38,31 @@ export default class EditorPage extends Component {
 
   // theme = {
   //   modal: 'palette-overlay'
+
+  menu;
   // }
 
 
 
-  constructor(props) {
-    super(props);
+  constructor(props) { 
+    super(props); 
+
+    //      let Menu = remote.Menu;
+    
+    
+
+    // let template = [
+    //   {label: 'M-Editor', submenu: [
+    //     {label: 'Test', click: () => {this.openPallette()}} 
+    //   ]}, 
+
+    //   {label: 'Why', submenu: [
+    //     {label: 'hello'}
+    //   ]}
+    // ]
+
+    // let menu = Menu.buildFromTemplate(template);
+    // Menu.setApplicationMenu(menu);
 
     this.initalcommands = [
       //Open Terminal
@@ -65,7 +87,7 @@ export default class EditorPage extends Component {
         // category: 'Editor',
         command: () => {
           //RESET EVERYTHING
-          this.getPath();
+          this.getPath(); 
           this.loadProject(true);
           // this.setFileName("Welcome. Select a file to begin.");
           // this.setFileLang("");
@@ -91,6 +113,7 @@ export default class EditorPage extends Component {
     this.state = {
       file_tree: [],
       openFiles: [],
+      openPallette: false,
       currentFile: undefined,
       projectPath: "",
       hasGitRepo: false,
@@ -520,6 +543,8 @@ export default class EditorPage extends Component {
             currentFile={this.state.currentFile}
             showNotification={this.showNotification}
             showModal={this.showModal} 
+            menu={this.menu}
+            openPallette={this.openPallette}
           />
         );
       }
@@ -545,6 +570,12 @@ export default class EditorPage extends Component {
     return View;
   };
 
+  openPallette = () => {
+    
+    this.setState({openPallette: true});
+    console.log('Hello')
+  }
+
 
 
   render() {
@@ -557,6 +588,7 @@ export default class EditorPage extends Component {
             hotKeys={["command+shift+p", "ctrl+shift+p"]}
             resetInputOnClose={true}
             placeholder="Enter a command"
+            open={this.state.openPallette}
           />
         )}
 
