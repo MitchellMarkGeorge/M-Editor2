@@ -1,11 +1,12 @@
 const path = require('path');
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: './src/index.js',
     mode: 'development',
-    target: 'electron-renderer',
+    target: 'electron-renderer', //should i use this???
     output: {
       filename: 'app.bundle.js',
       path: path.resolve(__dirname, 'build'),
@@ -48,7 +49,12 @@ module.exports = {
         new HtmlWebPackPlugin({
             template: "./index.html",
             
-          })
+          }),
+
+        new CopyPlugin([
+          {from: 'M-Editor.png', to: 'M-Editor.png'},
+          {from: 'main.js', to: 'main.js'}
+        ])
 
     
 

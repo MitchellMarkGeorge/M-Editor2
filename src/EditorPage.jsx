@@ -14,6 +14,7 @@ import * as fs from "fs";
 import * as git from "simple-git";
 import * as path_os from "path";
 import * as child_proccess from "child_process";
+import Moustrap from 'mousetrap';
 
 const { dialog, Menu } = remote;
 
@@ -25,7 +26,8 @@ import { Empty, notification } from "antd";
 import {
   GET_PROJECT_PATH,
   RECEIVED_PROJECT_PATH,
-  SEND_SAVE_FILE_SIGNAL
+  SEND_SAVE_FILE_SIGNAL,
+  CANCELED
 } from "../utils/constants";
 
 import "./EditorPage.css";
@@ -57,21 +59,21 @@ export default class EditorPage extends Component {
     let template = [
       ...(isMac
         ? [
-            {
-              label: app.name,
-              submenu: [
-                { role: "about" },
-                { type: "separator" },
-                { role: "services" },
-                { type: "separator" },
-                { role: "hide" },
-                { role: "hideothers" },
-                { role: "unhide" },
-                { type: "separator" },
-                { role: "quit" }
-              ]
-            }
-          ]
+          {
+            label: remote.app.name,
+            submenu: [
+              { role: "about" },
+              { type: "separator" },
+              { role: "services" },
+              { type: "separator" },
+              { role: "hide" },
+              { role: "hideothers" },
+              { role: "unhide" },
+              { type: "separator" },
+              { role: "quit" }
+            ]
+          }
+        ]
         : []),
 
       {
@@ -81,16 +83,25 @@ export default class EditorPage extends Component {
 
       ...(isDev
         ? [
-            {
-              label: "DevTools",
-              submenu: [
-                { role: "reload" },
-                { role: "forcereload" },
-                { role: "toggledevtools" }
-              ]
-            }
-          ]
+          {
+            label: "DevTools",
+            submenu: [
+              { role: "reload" },
+              { role: "forcereload" },
+              { role: "toggledevtools" }
+            ]
+          }
+        ]
         : []),
+
+        // {
+        //   label: "DevTools",
+        //   submenu: [
+        //     { role: "reload" },
+        //     { role: "forcereload" },
+        //     { role: "toggledevtools" }
+        //   ]
+        // },
 
       {
         label: "Git Commands",
@@ -149,11 +160,20 @@ export default class EditorPage extends Component {
             click: () => {
               this.sendSaveFile();
             }
-          }
+          },
+
+          // {
+          //   label: "Command Pallette",
+          //   click: () => {
+          //     this.callCommandPallete();
+          //   }
+          // }
         ]
       },
 
-      { role: "editMenu" } // think about this
+      { role: "editMenu" }, 
+      
+      // think about this
 
       //   {label: 'Edit',
       //   submenu: [
@@ -179,7 +199,7 @@ export default class EditorPage extends Component {
         // category: 'Editor',
         command: () => {
           this.refreshFileTree();
-          this.showNotification("File Tree refreshed", null, "success");
+
         }
       },
 
@@ -282,6 +302,15 @@ export default class EditorPage extends Component {
       ipcRenderer.send(SEND_SAVE_FILE_SIGNAL, "");
     }
   };
+
+  callCommandPallete = () => {
+    if (this.state.file_tree.length > 0) {
+      console.log('done')
+
+      Moustrap.trigger("ctrl+shift+p");
+
+    }
+  }
 
   showModal = () => {
     console.log("do something");
@@ -430,6 +459,7 @@ export default class EditorPage extends Component {
   }; //SET GLOBAL GIVE VARIABLE
 
   addAll = () => {
+    if (this.state.projectPath) {
     git(this.state.projectPath).add(".", err => {
       if (err)
         this.showNotification("Unable to add files", "Try again.", "error");
@@ -438,9 +468,11 @@ export default class EditorPage extends Component {
       }
       //ADD SUCCESS MESSAGE
     });
+  } else this.showNotification('No project selected.', null, 'error')
   };
 
   commitFiles = () => {
+    if (this.state.projectPath) {
     git(this.state.projectPath).commit("new changes made", err => {
       if (err)
         this.showNotification("Unable to commit files", "Try again.", "error");
@@ -448,9 +480,11 @@ export default class EditorPage extends Component {
         this.showNotification("Commited all files to Git", null, "success");
       }
     });
+  } else this.showNotification('No project selected.', null, 'error')
   };
 
   pullRepo = () => {
+    if (this.state.projectPath) {
     git(this.state.projectPath).pull(err => {
       if (err)
         this.showNotification(
@@ -463,9 +497,12 @@ export default class EditorPage extends Component {
         this.showNotification("Pulled files from Git", null, "success");
       }
     });
+  }
   };
 
   initalizeGit = () => {
+
+    if (this.state.projectPath) {
     git(this.state.projectPath).init(false, err => {
       if (err)
         this.showNotification(
@@ -477,6 +514,7 @@ export default class EditorPage extends Component {
         this.showNotification("Initalized new Git repository", null, "success");
       }
     });
+  } else this.showNotification('No project selected.', null, 'error')
   };
 
   addGitCommands = () => {
@@ -533,6 +571,10 @@ export default class EditorPage extends Component {
   };
 
   componentDidMount() {
+
+    ipcRenderer.on(CANCELED, () => {
+      document.body.style.cursor = "default";
+    })
     // git(this.state.projectPath).push()
 
     // ipcRenderer.on(RECEIVED_PROJECT_PATH, (event, arg) => {
@@ -568,14 +610,22 @@ export default class EditorPage extends Component {
   }
 
   refreshFileTree = () => {
-    walk(this.state.projectPath, (err, result) => {
-      if (result) {
-        // handle error
-        //console.log(result);
-        this.setState({ file_tree: [result] });
-        this.addGitCommands();
-      }
-    });
+
+    if (this.state.projectPath) {
+      walk(this.state.projectPath, (err, result) => {
+        if (result) {
+          // handle error
+          //console.log(result);
+          this.setState({ file_tree: [result] });
+          this.showNotification("File Tree refreshed", null, "success"); // after the setState or after the gitcommands?
+          this.addGitCommands();
+
+
+        } else if (err) {
+          this.showNotification('Unable to refresh File Tree', null, 'error')
+        }
+      });
+    }
   };
 
   onClick = (keys, event) => {

@@ -207,6 +207,8 @@ export default class CodeEditor extends Component {
         //     }
         // });
         const menu = new remote.Menu();
+        menu.append(new remote.MenuItem({ label: 'Go To Start', click: (e) => {console.log(e); this.codeEditor.execCommand('goDocStart')} }));
+        menu.append(new remote.MenuItem({ label: 'Go To End', click: (e) => {console.log(e); this.codeEditor.execCommand('goDocEnd')} }));
         menu.append(new remote.MenuItem({ label: 'Undo', click: () => {this.codeEditor.execCommand('undo')} }));
         menu.append(new remote.MenuItem({ label: 'Redo', click: () => {this.codeEditor.execCommand('redo')} }));
         menu.append(new remote.MenuItem({ label: 'Comment', click: () => {this.codeEditor.execCommand('toggleCommentIndented')} }));
@@ -275,6 +277,7 @@ export default class CodeEditor extends Component {
     }
 
     showContextMenu = (event) => {
+        console.log(event.target)
         event.preventDefault();
         this.menu.popup({ window: remote.getCurrentWindow() });
     }

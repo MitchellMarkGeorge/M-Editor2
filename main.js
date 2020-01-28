@@ -2,7 +2,7 @@ const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 
 const path = require('path');
 const isDev = require('electron-is-dev');
-const { GET_PROJECT_PATH, RECEIVED_PROJECT_PATH, SEND_SAVE_FILE_SIGNAL, RECEIVED_SAVE_FILE_SIGNAL } = require('./utils/constants');
+const { GET_PROJECT_PATH, RECEIVED_PROJECT_PATH, SEND_SAVE_FILE_SIGNAL, RECEIVED_SAVE_FILE_SIGNAL, CANCELED } = require('./utils/constants');
 // const FileTree = require('./src/Filetree').FileTree;
 const os = require('os')
 
@@ -47,7 +47,7 @@ function createWindow() {
       nodeIntegration: true // MUST ALWAYS BE TRUE
     }
   });
-  mainWindow.loadURL(isDev ? 'http://localhost:8080' : `file://${path.join(__dirname, '../index.html')}`);// make sure webpack builds to "build folder"
+  mainWindow.loadURL(isDev ? 'http://localhost:8080' : `file://${path.join(__dirname, 'build/index.html')}`);// make sure webpack builds to "build folder"
   //   if (isDev) { build/index.html
   //     // Open the DevTools.
   //     //BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
@@ -60,16 +60,16 @@ function createWindow() {
   });
 
   mainWindow.on('close', (e) => {
-    warnUser();
+    warnUser(e);
   })
 }
 
 app.on('before-quit', (e) => {
-  warnUser()  
+  warnUser(e)  
 
 })
 
-function warnUser() {
+function warnUser(event) {
   let choice = dialog.showMessageBox(
     {
       type: 'question',
@@ -81,7 +81,7 @@ function warnUser() {
   choice.then(result => {
     console.log(result)
     if (result.response == 0) {
-      e.preventDefault();
+      event.preventDefault();
     }
 
 
@@ -97,6 +97,7 @@ ipcMain.on(GET_PROJECT_PATH, (event, arg) => {
     .then((result) => {
       if (result.canceled || result.filePaths[0] === os.homedir() || result.filePaths.length === 0) { // althoug the filepath will not be 0
         console.log('CANCELED!!')
+        mainWindow.webContents.send(CANCELED, '');
         return;
       } else {
         let filepath = result.filePaths;

@@ -1,6 +1,6 @@
 {
   "name": "m-editor2",
-  "productName": "M-Editor", 
+  "productName": "M-Editor",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
@@ -8,13 +8,44 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --mode development",
-    "build": "cross-env NODE_ENV=production cross-env BABEL_ENV=production webpack --mode=production",
+    "build": "cross-env NODE_ENV=production cross-env BABEL_ENV=production webpack --config webpack.prod.js",
     "electron": "concurrently \"cross-env NODE_ENV=development cross-env BABEL_ENV=development npm start\" \"wait-on http://localhost:8080 && electron .\"",
-    "electron-pack": "npm run build && electron-builder"
+    "electron-pack-win": "npm run build && electron-builder --win",
+    "electron-pack-mac": "npm run build && electron-builder --mac",
+    "electron-builder": "electron-builder"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "build": {
+    "productName": "M-Editor",
+    "files": [
+      
+      "build/**/*",
+      "node_modules/**/*",
+      "main.js",
+      "utils/**/*"
+    ],
+    "mac": {
+      "icon": "build/M-Editor.png",
+      "target": [
+        "dmg"
+      ]
+    },
+    "dmg": {
+      "icon": "build/M-Editor.png"
+    },
+    "win": {
+      "icon": "build/M-Editor.png",
+      "target": [
+        "nsis",
+        "msi"
+      ]
+    },
+    "nsis": {
+      "installerIcon": "build/M-Editor.png"
+    }
+  },
   "devDependencies": {
     "@babel/core": "^7.8.3",
     "@babel/preset-env": "^7.8.3",
@@ -23,6 +54,7 @@
     "babel-preset-react-app": "^9.1.0",
     "clean-webpack-plugin": "^3.0.0",
     "concurrently": "^5.0.2",
+    "copy-webpack-plugin": "^5.1.1",
     "cross-env": "^6.0.3",
     "css-loader": "^3.4.2",
     "electron": "^7.1.9",
@@ -30,10 +62,12 @@
     "file-loader": "^5.0.2",
     "html-webpack-plugin": "^3.2.0",
     "style-loader": "^1.1.3",
+    "terser-webpack-plugin": "^2.3.2",
     "wait-on": "^3.3.0",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.10.1"
+    "webpack-dev-server": "^3.10.1",
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
     "antd": "^3.26.7",
