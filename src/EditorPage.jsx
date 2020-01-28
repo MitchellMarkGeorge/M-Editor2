@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import CodeEditor from "./CodeEditor";
-import ImageViewer from './ImageViewer';
+import ImageViewer from "./ImageViewer";
 import FileTree from "./FileTree";
 import SplitPane from "react-split-pane";
 import { ipcRenderer } from "electron";
@@ -12,17 +12,21 @@ import { remote } from "electron";
 import * as os from "os";
 import * as fs from "fs";
 import * as git from "simple-git";
-import * as path_os from 'path';
+import * as path_os from "path";
 import * as child_proccess from "child_process";
-
 
 const { dialog, Menu } = remote;
 
-const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+const isMac = process.platform === "darwin";
 
 import { Empty, notification } from "antd";
 
-import { GET_PROJECT_PATH, RECEIVED_PROJECT_PATH } from "../utils/constants";
+import {
+  GET_PROJECT_PATH,
+  RECEIVED_PROJECT_PATH,
+  SEND_SAVE_FILE_SIGNAL
+} from "../utils/constants";
 
 import "./EditorPage.css";
 
@@ -39,30 +43,127 @@ export default class EditorPage extends Component {
   // theme = {
   //   modal: 'palette-overlay'
 
-  menu;
+
+
   // }
 
+  constructor(props) {
+    super(props);
 
+    //this.CodeEditor = React.createRef();
 
-  constructor(props) { 
-    super(props); 
+    let Menu = remote.Menu;
 
-    //      let Menu = remote.Menu;
-    
-    
+    let template = [
+      ...(isMac
+        ? [
+            {
+              label: app.name,
+              submenu: [
+                { role: "about" },
+                { type: "separator" },
+                { role: "services" },
+                { type: "separator" },
+                { role: "hide" },
+                { role: "hideothers" },
+                { role: "unhide" },
+                { type: "separator" },
+                { role: "quit" }
+              ]
+            }
+          ]
+        : []),
 
-    // let template = [
-    //   {label: 'M-Editor', submenu: [
-    //     {label: 'Test', click: () => {this.openPallette()}} 
-    //   ]}, 
+      {
+        label: "File",
+        submenu: [isMac ? { role: "close" } : { role: "quit" }]
+      },
 
-    //   {label: 'Why', submenu: [
-    //     {label: 'hello'}
-    //   ]}
-    // ]
+      ...(isDev
+        ? [
+            {
+              label: "DevTools",
+              submenu: [
+                { role: "reload" },
+                { role: "forcereload" },
+                { role: "toggledevtools" }
+              ]
+            }
+          ]
+        : []),
 
-    // let menu = Menu.buildFromTemplate(template);
-    // Menu.setApplicationMenu(menu);
+      {
+        label: "Git Commands",
+
+        submenu: [
+          {
+            label: "Git Init",
+            click: () => {
+              this.initalizeGit();
+            }
+          },
+          {
+            label: "Git Add",
+            click: () => {
+              this.addAll();
+            }
+          },
+          {
+            label: "Git Pull",
+            click: () => {
+              this.pullRepo();
+            }
+          }
+        ]
+      },
+      {
+        label: "Commands",
+        submenu: [
+          {
+            label: "New File",
+            click: () => {
+              this.newFile();
+            }
+          },
+          {
+            label: "Choose Project",
+            click: () => {
+              this.getPath();
+              this.loadProject(true);
+            }
+          },
+          {
+            label: "Open Terminal",
+            click: () => {
+              this.openTerminal();
+            }
+          },
+          {
+            label: "Refresh File Tree",
+            click: () => {
+              this.refreshFileTree();
+            }
+          },
+          {
+            label: "Save File",
+            click: () => {
+              this.sendSaveFile();
+            }
+          }
+        ]
+      },
+
+      { role: "editMenu" } // think about this
+
+      //   {label: 'Edit',
+      //   submenu: [
+      //     {label:}
+      //   ]
+      // }
+    ];
+
+    let appMenu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(appMenu);
 
     this.initalcommands = [
       //Open Terminal
@@ -87,7 +188,7 @@ export default class EditorPage extends Component {
         // category: 'Editor',
         command: () => {
           //RESET EVERYTHING
-          this.getPath(); 
+          this.getPath();
           this.loadProject(true);
           // this.setFileName("Welcome. Select a file to begin.");
           // this.setFileLang("");
@@ -99,7 +200,7 @@ export default class EditorPage extends Component {
         command: () => {
           this.openTerminal();
         }
-      },
+      }
 
       // {
       //   name: 'Git Init',  // should i still use this???
@@ -124,10 +225,9 @@ export default class EditorPage extends Component {
     };
 
     //   this.commands;
-    // this.initalcommands = 
+    // this.initalcommands =
 
     // this.state = this.initalState;
-
 
     // this.commands = this.copy(this.initalcommands);
     // console.log(this.initalcommands)
@@ -177,6 +277,12 @@ export default class EditorPage extends Component {
   //   this.addGitCommands();
   // }
 
+  sendSaveFile = () => {
+    if (this.state.currentFile) {
+      ipcRenderer.send(SEND_SAVE_FILE_SIGNAL, "");
+    }
+  };
+
   showModal = () => {
     console.log("do something");
     this.setState({
@@ -184,7 +290,7 @@ export default class EditorPage extends Component {
     });
   };
 
-  copy = (aObject) => {
+  copy = aObject => {
     if (!aObject) {
       return aObject;
     }
@@ -193,11 +299,11 @@ export default class EditorPage extends Component {
     let bObject = Array.isArray(aObject) ? [] : {};
     for (const k in aObject) {
       v = aObject[k];
-      bObject[k] = (typeof v === "object") ? this.copy(v) : v;
+      bObject[k] = typeof v === "object" ? this.copy(v) : v;
     }
 
     return bObject;
-  }
+  };
 
   openTerminal = () => {
     if (os.platform() == "darwin") {
@@ -233,7 +339,7 @@ export default class EditorPage extends Component {
       );
   };
 
-  loadProject = (newProject) => {
+  loadProject = newProject => {
     ipcRenderer.on(RECEIVED_PROJECT_PATH, (event, arg) => {
       // console.log(arg);
       const [project_path] = arg;
@@ -244,8 +350,16 @@ export default class EditorPage extends Component {
           // handle error
           console.log(result);
           if (newProject) {
-            document.body.style.cursor = 'default';
-            this.setState({ file_tree: [result], projectPath: project_path, currentFile: undefined, currentFileLang: "", currrentFileName: "Welcome. Select a file to begin.", commands: this.initalcommands, hasGitRepo: false })
+            document.body.style.cursor = "default";
+            this.setState({
+              file_tree: [result],
+              projectPath: project_path,
+              currentFile: undefined,
+              currentFileLang: "",
+              currrentFileName: "Welcome. Select a file to begin.",
+              commands: this.initalcommands,
+              hasGitRepo: false
+            });
             // this.commands = this.copy(this.initalcommands);
             // console.log(this.initalcommands);
             // console.log(this.commands)
@@ -255,12 +369,7 @@ export default class EditorPage extends Component {
             this.setState({ file_tree: [result], projectPath: project_path });
             //this.commands = this.initalcommands;
             //this.addGitCommands();
-
           }
-
-
-
-
         } else if (err) {
           this.showNotification(
             `Error in loading ${project_path}`,
@@ -356,56 +465,58 @@ export default class EditorPage extends Component {
     });
   };
 
-  // initalizeGit = () => {
-  //   git(this.state.projectPath).init(false, err => {
-  //     if (err)
-  //       this.showNotification(
-  //         "Unable to initalize Git repository",
-  //         "Try again.",
-  //         "error"
-  //       );
-  //     else {
-  //       this.showNotification("Initalized new Git repository", null, "success");
-  //     }
-  //   });
-  // };
+  initalizeGit = () => {
+    git(this.state.projectPath).init(false, err => {
+      if (err)
+        this.showNotification(
+          "Unable to initalize Git repository",
+          "Try again.",
+          "error"
+        );
+      else {
+        this.showNotification("Initalized new Git repository", null, "success");
+      }
+    });
+  };
 
   addGitCommands = () => {
-
     if (this.state.projectPath) {
       git(this.state.projectPath).checkIsRepo((err, isRepo) => {
         //console.log(isRepo);
         let newArray;
         if (isRepo) {
-          this.setState({ hasGitRepo: true })
+          this.setState({ hasGitRepo: true });
           //this.hasGitRepo = true;
 
           //console.log('working')
 
-          newArray = [...this.state.commands, {
-            name: "Git Add All Files",
-            // category: 'Git',
-            command: () => {
-              this.addAll();
-            }
-          },
+          newArray = [
+            ...this.state.commands,
+            {
+              name: "Git Add All Files",
+              // category: 'Git',
+              command: () => {
+                this.addAll();
+              }
+            },
 
-          {
-            name: "Git Commit (with Defult Message)",
-            // category: 'Git',
-            command: () => {
-              this.commitFiles();
-            }
-          },
+            {
+              name: "Git Commit (with Defult Message)",
+              // category: 'Git',
+              command: () => {
+                this.commitFiles();
+              }
+            },
 
-          {
-            name: "Git Pull",
-            command: () => {
-              this.pullRepo();
+            {
+              name: "Git Pull",
+              command: () => {
+                this.pullRepo();
+              }
             }
-          }]
+          ];
 
-          this.setState({ commands: newArray })
+          this.setState({ commands: newArray });
           // this.commands.push(
 
           // );
@@ -422,7 +533,6 @@ export default class EditorPage extends Component {
   };
 
   componentDidMount() {
-
     // git(this.state.projectPath).push()
 
     // ipcRenderer.on(RECEIVED_PROJECT_PATH, (event, arg) => {
@@ -447,7 +557,6 @@ export default class EditorPage extends Component {
     //   });
     // });
     //console.log(this.hasGitRepo);
-
 
     this.loadProject(true);
 
@@ -479,14 +588,18 @@ export default class EditorPage extends Component {
     if (object.mode) {
       lang = object.mode.name;
     } else if (object.isImage) {
-      lang = 'Image'
+      lang = "Image";
     } else {
-      lang = "Plain Text"
+      lang = "Plain Text";
     }
     // if (object.mode) {
 
     // }
-    this.setState({ currentFile: event.node, currrentFileName: object.title, currentFileLang: lang });
+    this.setState({
+      currentFile: event.node,
+      currrentFileName: object.title,
+      currentFileLang: lang
+    });
     console.log(`clicked ${event.node.props.title}`);
     //console.log(this.state.currentFile);
 
@@ -504,47 +617,46 @@ export default class EditorPage extends Component {
 
   getPath = () => {
     ipcRenderer.send(GET_PROJECT_PATH, "");
-    document.body.style.cursor = 'wait';
+    document.body.style.cursor = "wait";
   };
 
-  getFileObject(element, file_path) {
-    // is async needed
-    if (element?.props?.path == file_path) {
-      console.log("match made");
+  // getFileObject(element, file_path) {
+  //   // is async needed
+  //   if (element?.props?.path == file_path) {
+  //     console.log("match made");
 
-      return element;
-    } else if (element?.props?.children != undefined) {
-      var i;
-      var result = null;
-      for (i = 0; result == undefined && i < element.children.length; i++) {
-        result = this.getFileObject(element.children[i], file_path); // await
-      }
-      return result;
-    }
-    return null;
-  }
+  //     return element;
+  //   } else if (element?.props?.children != undefined) {
+  //     var i;
+  //     var result = null;
+  //     for (i = 0; result == undefined && i < element.children.length; i++) {
+  //       result = this.getFileObject(element.children[i], file_path); // await
+  //     }
+  //     return result;
+  //   }
+  //   return null;
+  // }
 
   getView = () => {
     let View;
     // add if no files are opened???
     // this.state.file_tree && this.state.file_tree.length
     if (this.state.currentFile) {
-
-      if (this.state.currentFile.props.isImage && this.state.currentFile.props.base64) {
-        View = (
-          <ImageViewer path={this.state.currentFile.props.base64} />
-        )
+      if (
+        this.state.currentFile.props.isImage &&
+        this.state.currentFile.props.base64
+      ) {
+        View = <ImageViewer path={this.state.currentFile.props.base64} />;
       } else {
         View = (
           <CodeEditor
+            // ref={this.CodeEditor}
             setFileName={this.setFileName}
             setFileLang={this.setFileLang}
             openFiles={this.state.openFiles}
             currentFile={this.state.currentFile}
             showNotification={this.showNotification}
-            showModal={this.showModal} 
-            menu={this.menu}
-            openPallette={this.openPallette}
+
           />
         );
       }
@@ -555,7 +667,7 @@ export default class EditorPage extends Component {
             position: "relative",
             height: "100%",
             // backgroundColor: "#14171d"
-            backgroundColor: '#212121'
+            backgroundColor: "#212121"
           }}
         >
           <Empty
@@ -571,12 +683,9 @@ export default class EditorPage extends Component {
   };
 
   openPallette = () => {
-    
-    this.setState({openPallette: true});
-    console.log('Hello')
-  }
-
-
+    this.open = true;
+    console.log("Hello");
+  };
 
   render() {
     return (
@@ -588,7 +697,7 @@ export default class EditorPage extends Component {
             hotKeys={["command+shift+p", "ctrl+shift+p"]}
             resetInputOnClose={true}
             placeholder="Enter a command"
-            open={this.state.openPallette}
+            maxDisplayed={10}
           />
         )}
 
@@ -620,16 +729,15 @@ export default class EditorPage extends Component {
               <Icon
                 type={
                   this.state.hasGitRepo
-                    ? 'branches' // or use 'forks'
+                    ? "branches" // or use 'forks'
                     : "api"
                 }
               />
             </span>
             <span className="low-bar-text">{this.state.currrentFileName}</span>
-            {this.state.currentFileLang && <span className="low-bar-text">{this.state.currentFileLang}</span>}
-
-
-
+            {this.state.currentFileLang && (
+              <span className="low-bar-text">{this.state.currentFileLang}</span>
+            )}
 
             {/* {this.state.hasGitRepo &&
 

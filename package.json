@@ -1,5 +1,6 @@
 {
   "name": "m-editor2",
+  "productName": "M-Editor", 
   "version": "1.0.0",
   "description": "",
   "main": "main.js",

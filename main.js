@@ -2,7 +2,7 @@ const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 
 const path = require('path');
 const isDev = require('electron-is-dev');
-const { GET_PROJECT_PATH, RECEIVED_PROJECT_PATH } = require('./utils/constants');
+const { GET_PROJECT_PATH, RECEIVED_PROJECT_PATH, SEND_SAVE_FILE_SIGNAL, RECEIVED_SAVE_FILE_SIGNAL } = require('./utils/constants');
 // const FileTree = require('./src/Filetree').FileTree;
 const os = require('os')
 
@@ -60,25 +60,36 @@ function createWindow() {
   });
 
   mainWindow.on('close', (e) => {
-    let choice = dialog.showMessageBox(
-      {
-        type: 'question',
-        buttons: ['No', 'Yes'],
-        title: 'Confirm',
-        message: 'Are you sure you want to quit? You might have some unsaved changed.'
-      });
-
-      choice.then(result => {
-        console.log(result)
-        if (result.response == 0) {
-          e.preventDefault();
-        }
-
-        
-      });
-   
+    warnUser();
   })
 }
+
+app.on('before-quit', (e) => {
+  warnUser()  
+
+})
+
+function warnUser() {
+  let choice = dialog.showMessageBox(
+    {
+      type: 'question',
+      buttons: ['No', 'Yes'],
+      title: 'Confirm',
+      message: 'Are you sure you want to quit? You might have some unsaved changed.'
+    });
+
+  choice.then(result => {
+    console.log(result)
+    if (result.response == 0) {
+      e.preventDefault();
+    }
+
+
+  });
+}
+
+
+
 
 ipcMain.on(GET_PROJECT_PATH, (event, arg) => {
   console.log('open file dialog');
@@ -98,6 +109,11 @@ ipcMain.on(GET_PROJECT_PATH, (event, arg) => {
       console.error(err);
     })
 })
+
+ipcMain.on(SEND_SAVE_FILE_SIGNAL, (event, arg) => {
+  mainWindow.webContents.send(RECEIVED_SAVE_FILE_SIGNAL, '')
+})
+
 
 
 // const dockMenu = Menu.buildFromTemplate([

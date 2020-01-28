@@ -3,6 +3,8 @@ import * as codemirror from 'codemirror'
 import { notification } from 'antd';
 import { remote } from "electron";
 import * as fs from 'fs';
+import { ipcRenderer } from "electron";
+import { RECEIVED_SAVE_FILE_SIGNAL } from "../utils/constants";
 // import { Empty } from 'antd';
 import 'codemirror-colorpicker/dist/codemirror-colorpicker.css'
 import 'codemirror-colorpicker'
@@ -36,7 +38,16 @@ export default class CodeEditor extends Component {
    
         Moustrap.bind(['ctrl+s', 'command+s'], () => {
             this.saveFile();
-        })
+        });
+
+        const appMenu = this.props.Appmenu;
+        console.log(appMenu)
+        // appMenu.append({
+        //     label: 'Editor' ,
+        //     submenu: [
+        //         {label: 'Save File', click: () => {this.saveFile()}}
+        //     ]
+        // })
 
 
 
@@ -135,6 +146,11 @@ export default class CodeEditor extends Component {
 
     componentDidMount() {
         // console.log(this.editor);
+
+        ipcRenderer.on(RECEIVED_SAVE_FILE_SIGNAL, () => {
+            this.saveFile();
+        })
+
         codemirror.commands.save = () => {
             this.saveFile();
         }
@@ -169,11 +185,27 @@ export default class CodeEditor extends Component {
             styleActiveLine: true,
             //placeholder: 'Code goes here...',
             keyMap: 'sublime',
+            extraKeys: {"Ctrl-Space": "autocomplete" , ".": (cm) => {
+                setTimeout(() => {
+                  cm.execCommand("autocomplete")
+                    }, 100); throw new Error('Need this error to show to work');}},
             theme: 'material-darker',
             colorpicker: {
                 mode: 'edit'
             } // think about theme
         })
+
+        // reconsider
+        // this.codeEditor.on("keyup", function (cm, event) {
+        //     //console.log(event.keyCode)
+        //     if (!cm.state.completionActive && (event.keyCode && event.keyCode > 64 && event.keyCode < 91 
+                
+        //         )) {
+                
+                
+        //         codemirror.commands.autocomplete(cm);
+        //     }
+        // });
         const menu = new remote.Menu();
         menu.append(new remote.MenuItem({ label: 'Undo', click: () => {this.codeEditor.execCommand('undo')} }));
         menu.append(new remote.MenuItem({ label: 'Redo', click: () => {this.codeEditor.execCommand('redo')} }));
@@ -186,7 +218,7 @@ export default class CodeEditor extends Component {
         menu.append(new remote.MenuItem({ type: 'separator' }));
         menu.append(new remote.MenuItem({ label: 'Save File', click: () => {this.codeEditor.execCommand('save')} }));
         
-
+        
         
         this.menu = menu;
 
