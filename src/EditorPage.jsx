@@ -7,6 +7,7 @@ import SplitPane from "react-split-pane";
 import { ipcRenderer } from "electron";
 import { Icon } from "antd";
 import walk from "./FileDta";
+import { walk2 } from "./FileDta"
 import CommandPalette from "react-command-palette";
 import { remote } from "electron";
 import * as os from "os";
@@ -94,14 +95,14 @@ export default class EditorPage extends Component {
         ]
         : []),
 
-        // {
-        //   label: "DevTools",
-        //   submenu: [
-        //     { role: "reload" },
-        //     { role: "forcereload" },
-        //     { role: "toggledevtools" }
-        //   ]
-        // },
+      // {
+      //   label: "DevTools",
+      //   submenu: [
+      //     { role: "reload" },
+      //     { role: "forcereload" },
+      //     { role: "toggledevtools" }
+      //   ]
+      // },
 
       {
         label: "Git Commands",
@@ -119,6 +120,14 @@ export default class EditorPage extends Component {
               this.addAll();
             }
           },
+
+          {
+            label: "Git Commit",
+            click: () => {
+              this.commitFiles();
+            }
+          },
+
           {
             label: "Git Pull",
             click: () => {
@@ -143,6 +152,14 @@ export default class EditorPage extends Component {
               this.loadProject(true);
             }
           },
+
+          {
+            label: "Generate Config File",
+            click: () => {
+              this.generateConfigFile();
+            }
+          },
+
           {
             label: "Open Terminal",
             click: () => {
@@ -171,8 +188,15 @@ export default class EditorPage extends Component {
         ]
       },
 
-      { role: "editMenu" }, 
-      
+      { role: "editMenu" },
+
+      //  ...(isMac
+      //   ? [
+      //     {role: "help"}
+      //   ] 
+      //   : []),
+
+
       // think about this
 
       //   {label: 'Edit',
@@ -219,6 +243,13 @@ export default class EditorPage extends Component {
         name: "Open Terminal",
         command: () => {
           this.openTerminal();
+        }
+      },
+
+      {
+        name: 'Generate M-Editor Config File',
+        command: () => {
+          this.generateConfigFile();
         }
       }
 
@@ -373,8 +404,8 @@ export default class EditorPage extends Component {
       // console.log(arg);
       const [project_path] = arg;
       // array destructuring
-
-      walk(project_path, (err, result) => {
+      //walk2(project_path, (err, result) => {if (result) console.log('Walk 2: ', result)})
+      walk2(project_path, (err, result) => {
         if (result) {
           // handle error
           console.log(result);
@@ -410,32 +441,49 @@ export default class EditorPage extends Component {
     });
   };
 
-  newFile = () => {
-    dialog
-      .showSaveDialog(remote.getCurrentWindow(), {
-        title: "Create New File",
-        defaultPath: this.state.projectPath
-      })
-      .then(result => {
-        if (result.canceled) {
-          return;
-        } else if (result.filePath) {
-          fs.writeFile(result.filePath, "", err => {
-            if (err) return;
-            this.showNotification(
-              `New file ${path_os.basename(result.filePath)} made`,
-              null,
-              "success"
-            );
-          });
 
-          //console.log(this.getFileObject(result.filePath, this.state.file_tree))
-          this.refreshFileTree();
-          console.log(
-            this.getFileObject(this.state.file_tree[0], result.filePath)
-          );
-        }
-      });
+  generateConfigFile = () => {
+    let config_file_path = path_os.resolve(this.state.projectPath, 'm-editor.config.json');
+
+    if (fs.existsSync(config_file_path)) {
+      this.showNotification('M-Editor Config file already exists in this project', null, 'error');
+    } else {
+      try {
+        fs.writeFileSync(config_file_path, '{\n\t"git": {}\n}');
+        this.refreshFileTree()
+        this.showNotification('M-Editor Config file made.', null, 'success');
+      } catch (err) {
+        this.showNotification('Unable to make M-Editor Config file', null, 'error');
+      }
+    }
+  }
+
+  newFile = () => {
+    if (this.state.file_tree.length > 0) {
+      dialog
+        .showSaveDialog(remote.getCurrentWindow(), {
+          title: "Create New File",
+          defaultPath: this.state.projectPath
+        })
+        .then(result => {
+          if (result.canceled) {
+            return;
+          } else if (result.filePath) {
+            fs.writeFile(result.filePath, "", err => {
+              if (err) return;
+              this.showNotification(
+                `New file ${path_os.basename(result.filePath)} made`,
+                null,
+                "success"
+              );
+            });
+
+            //console.log(this.getFileObject(result.filePath, this.state.file_tree))
+            this.refreshFileTree();
+
+          }
+        });
+    }
   };
   setFileName = fileName => {
     this.currrentFileName = fileName;
@@ -460,61 +508,87 @@ export default class EditorPage extends Component {
 
   addAll = () => {
     if (this.state.projectPath) {
-    git(this.state.projectPath).add(".", err => {
-      if (err)
-        this.showNotification("Unable to add files", "Try again.", "error");
-      else {
-        this.showNotification("Added all files to Git", null, "success");
-      }
-      //ADD SUCCESS MESSAGE
-    });
-  } else this.showNotification('No project selected.', null, 'error')
+      git(this.state.projectPath).add(".", err => {
+        if (err)
+          this.showNotification("Unable to add files", "Try again.", "error");
+        else {
+          this.showNotification("Added all files to Git", null, "success");
+        }
+        //ADD SUCCESS MESSAGE
+      });
+    } else this.showNotification('No project selected.', null, 'error')
   };
+
+  getConfigFileContent = () => {
+    let config_file_path = path_os.resolve(this.state.projectPath, 'm-editor.config.json');
+    console.log(config_file_path)
+    try {
+      let config_content = JSON.parse(fs.readFileSync(config_file_path));
+      console.log(config_content)
+      return config_content;
+    } catch (err) {
+      this.showNotification("Unable to read M-Editor Config File", 'Try Again', 'error')
+    }
+
+  }
 
   commitFiles = () => {
     if (this.state.projectPath) {
-    git(this.state.projectPath).commit("new changes made", err => {
-      if (err)
-        this.showNotification("Unable to commit files", "Try again.", "error");
-      else {
-        this.showNotification("Commited all files to Git", null, "success");
-      }
-    });
-  } else this.showNotification('No project selected.', null, 'error')
+      let commit_message = this.getConfigFileContent()?.git?.commit_message;
+      console.log(this.getConfigFileContent())
+      let final_message = commit_message || "new changes made";
+
+
+      // if (commit_message) {
+      //   final_message = commit_message;
+      // } else {
+      //   final_message = "new changes made"
+      // }
+
+      // final_message = commit_message? commit_message: "new changes made"
+      git(this.state.projectPath).commit(final_message, err => {
+        if (err)
+          this.showNotification("Unable to commit files", "Try again.", "error");
+        else {
+          this.showNotification("Commited all files to Git", null, "success");
+        }
+      });
+    } else this.showNotification('No project selected.', null, 'error')
   };
 
   pullRepo = () => {
     if (this.state.projectPath) {
-    git(this.state.projectPath).pull(err => {
-      if (err)
-        this.showNotification(
-          "Unable to pull files from Git",
-          "Try again",
-          "error"
-        );
-      else {
-        this.refreshFileTree();
-        this.showNotification("Pulled files from Git", null, "success");
-      }
-    });
-  }
+      git(this.state.projectPath).pull(err => {
+        if (err)
+          this.showNotification(
+            "Unable to pull files from Git",
+            "Try again",
+            "error"
+          );
+        else {
+          this.refreshFileTree();
+          this.showNotification("Pulled files from Git", null, "success");
+        }
+      });
+    }
   };
 
   initalizeGit = () => {
 
     if (this.state.projectPath) {
-    git(this.state.projectPath).init(false, err => {
-      if (err)
-        this.showNotification(
-          "Unable to initalize Git repository",
-          "Try again.",
-          "error"
-        );
-      else {
-        this.showNotification("Initalized new Git repository", null, "success");
-      }
-    });
-  } else this.showNotification('No project selected.', null, 'error')
+      git(this.state.projectPath).init(false, err => {
+        if (err)
+          this.showNotification(
+            "Unable to initalize Git repository",
+            "Try again.",
+            "error"
+          );
+        else {
+          this.showNotification("Initalized new Git repository", null, "success");
+          this.addGitCommands();
+        }
+      });
+    } else this.showNotification('No project selected.', null, 'error')
   };
 
   addGitCommands = () => {
@@ -539,7 +613,7 @@ export default class EditorPage extends Component {
             },
 
             {
-              name: "Git Commit (with Defult Message)",
+              name: "Git Commit",
               // category: 'Git',
               command: () => {
                 this.commitFiles();
@@ -609,16 +683,21 @@ export default class EditorPage extends Component {
     //ipcRenderer.removeListener(RECEIVED_PROJECT_PATH); // SHOULD I DO THIS??
   }
 
+  resetcurrentFile = () => {
+    this.setState({ currentFile: undefined, currentFileLang: "", currrentFileName: "Welcome. Select a file to begin.", })
+  }
+
   refreshFileTree = () => {
 
     if (this.state.projectPath) {
-      walk(this.state.projectPath, (err, result) => {
+      walk2(this.state.projectPath, (err, result) => {
         if (result) {
           // handle error
           //console.log(result);
           this.setState({ file_tree: [result] });
-          this.showNotification("File Tree refreshed", null, "success"); // after the setState or after the gitcommands?
+          //this.showNotification("File Tree refreshed", null, "success"); // after the setState or after the gitcommands?
           this.addGitCommands();
+          git(this.state.projectPath).status((hello, status) => { console.log(status) })
 
 
         } else if (err) {
@@ -631,7 +710,7 @@ export default class EditorPage extends Component {
   onClick = (keys, event) => {
     //console.log(event);
     let object = event.node.props;
-    if (object.path === this.state?.currentFile?.props?.path) return;
+    // if (object.path === this.state?.currentFile?.props?.path) return;
     // let lang = object.mode ? object.mode.name : "Plain Text";
     let lang;
 
@@ -766,6 +845,13 @@ export default class EditorPage extends Component {
                 file_tree={this.state.file_tree}
                 getPath={this.getPath}
                 onClick={this.onClick}
+                refreshFileTree={this.refreshFileTree}
+                projectPath={this.state.projectPath}
+                showNotification={this.showNotification}
+                currentFile={this.state.currentFile}
+                newFile={this.newFile}
+                resetcurrentFile={this.resetcurrentFile}
+                generateConfigFile={this.generateConfigFile}
               />
               {this.getView()}
               {/* <CodeEditor currrentFileName={this.state.currrentFileName} currentFileLang={this.state.currentFileLang} openFiles={this.state.openFiles} currentFile={this.state.currentFile} /> */}

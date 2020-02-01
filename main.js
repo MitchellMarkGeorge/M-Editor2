@@ -4,7 +4,7 @@ const path = require('path');
 const isDev = require('electron-is-dev');
 const { GET_PROJECT_PATH, RECEIVED_PROJECT_PATH, SEND_SAVE_FILE_SIGNAL, RECEIVED_SAVE_FILE_SIGNAL, CANCELED } = require('./utils/constants');
 // const FileTree = require('./src/Filetree').FileTree;
-const os = require('os')
+const os = require('os');
 
 
 
@@ -33,9 +33,8 @@ let mainWindow;
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 900, // set min and max values
-    height: 700,
-    minWidth: 450,
-    minHeight: 350,
+    height: 800,
+    
     title: 'M-Editor',
     backgroundColor: '#2c2f33',
     // frame: false,
@@ -59,15 +58,18 @@ function createWindow() {
     mainWindow.show()
   });
 
+
   mainWindow.on('close', (e) => {
     warnUser(e);
   })
 }
 
-app.on('before-quit', (e) => {
-  warnUser(e)  
 
-})
+
+// app.on('before-quit', (e) => {
+//   warnUser(e)  
+
+// })
 
 function warnUser(event) {
   let choice = dialog.showMessageBox(
@@ -98,7 +100,7 @@ ipcMain.on(GET_PROJECT_PATH, (event, arg) => {
       if (result.canceled || result.filePaths[0] === os.homedir() || result.filePaths.length === 0) { // althoug the filepath will not be 0
         console.log('CANCELED!!')
         mainWindow.webContents.send(CANCELED, '');
-        return;
+        // return;
       } else {
         let filepath = result.filePaths;
         mainWindow.webContents.send(RECEIVED_PROJECT_PATH, filepath)
@@ -112,7 +114,7 @@ ipcMain.on(GET_PROJECT_PATH, (event, arg) => {
 })
 
 ipcMain.on(SEND_SAVE_FILE_SIGNAL, (event, arg) => {
-  mainWindow.webContents.send(RECEIVED_SAVE_FILE_SIGNAL, '')
+  mainWindow.webContents.send(RECEIVED_SAVE_FILE_SIGNAL, '');
 })
 
 

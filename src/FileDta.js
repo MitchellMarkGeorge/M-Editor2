@@ -1,11 +1,11 @@
 
 // import * as fs from 'fs';
 
- import * as path_os from 'path';
+import * as path_os from 'path';
 
- import * as is_image from 'is-image';
- import * as image_type from 'image-type';
- 
+import * as is_image from 'is-image';
+import * as image_type from 'image-type';
+
 
 // import * as os from 'os';
 
@@ -232,6 +232,217 @@ import path from 'path';
 // make into promisies?????
 // specify key
 
+// export function walk2(project_path, callback) {
+//   let rootObject = {
+//     "path": project_path,
+//     "title": path.basename(project_path),
+//     "isLeaf": false,
+//     "children": [],
+//     "selectable": false
+//   }
+//   fs.readdir(project_path, function (err, inital_array) {
+//     if (err) { return callback(err) }
+
+//     if (inital_array.length === 0) {
+//       console.log('empty arr');
+//     }
+
+//     // dont load node_modules files OR .git (do i need to remove .git???)
+//     if (inital_array.includes('node_modules')) {
+//       removeItem(inital_array, 'node_modules');
+
+//     }
+
+//     if (inital_array.includes('.git')) {
+
+//       removeItem(inital_array, '.git');
+//     }
+
+//     if (inital_array.includes('.idea')) {
+
+//       removeItem(inital_array, '.idea');
+//     }
+
+//     if (inital_array.includes('.vscode')) {
+
+//       removeItem(inital_array, '.vscode');
+//     }
+
+
+
+//     if (inital_array.includes('.DS_Store')) {
+//       removeItem(inital_array, '.DS_Store');
+//     }
+
+//     if (inital_array.length == 0) return callback(null, rootObject);
+
+//     for (let item of inital_array) {
+
+//       fs.stat(path_os.resolve(project_path, item), function (err, stats) {
+//         if (err) return callback(err, null);
+//         if (stats && stats.isDirectory()) {
+//           walk2(path_os.resolve(project_path, item), function (err, res) {
+//             if (err) return callback(err, null);
+//             rootObject.children.push(res);
+//           });
+//         } else {
+//           let file_content = fs.readFileSync(path_os.resolve(project_path, item))
+            
+//             if (file_content) {
+//               let base64String;
+//               let text = file_content;
+//               let mode = code.findModeByFileName(item);
+//               // let document = code.Doc(text.toString(), mode)
+//               let document;
+//               let isImage = is_image(path_os.resolve(project_path, item));
+//               let imageType = image_type(text);
+
+//               if (imageType) {
+//                 let imageTypeMime = imageType.mime;
+//                 let data = text.toString('base64');
+//                 base64String = `data:${imageTypeMime};base64,${data}`
+
+//               } else {
+//                 text = text.toString(); // do i actually need to?
+//                 document = code.Doc(text, mode)
+//               }
+
+//               let file_obj = {
+//                 "path": path_os.resolve(project_path, item),
+//                 "mode": mode,
+//                 "document": document,
+//                 "isLeaf": true,
+//                 "title": item,
+//                 "saved": true,
+//                 "isImage": isImage,
+//                 "base64": base64String
+//               }
+//               rootObject.children.push(file_obj);
+              
+//             }
+          
+          
+//         }
+//       })
+//       if (!err) {callback(null, rootObject)}
+//     }
+    
+    
+//   })
+
+// }
+
+
+export function walk2(project_path, done) {
+
+  var results = {
+        "path": project_path,
+        "title": path.basename(project_path),
+        "isLeaf": false,
+        "children": [],
+        "selectable": false,
+        "key": project_path 
+      };
+
+  //results.key = results.path;
+  fs.readdir(project_path, function(err, list) {
+    if (err) return done(err);
+    if (list.length === 0) {
+      console.log('empty arr');
+    }
+
+    // dont load node_modules files OR .git (do i need to remove .git???)
+    if (list.includes('node_modules')) {
+      removeItem(list, 'node_modules');
+
+    }
+
+    if (list.includes('.git')) {
+
+      removeItem(list, '.git');
+    }
+
+    if (list.includes('.idea')) {
+
+      removeItem(list, '.idea');
+    }
+
+    if (list.includes('.vscode')) {
+
+      removeItem(list, '.vscode');
+    }
+
+    var i = 0;
+    (function next() {
+      var file = list[i++];
+      //console.log(file) // first element in array???
+      if (!file) return done(null, results);
+      var file_path = path.resolve(project_path, file);
+      fs.stat(file_path, function(err, stat) {
+        if (stat && stat.isDirectory()) {
+          walk(file_path, function(err, res) {
+            
+            //res.key = res.path;
+            //results.key = res.path; 
+            results.children.push(res);
+            
+            next();
+          });
+        } else {
+          let base64String;
+          let text = fs.readFileSync(file_path);
+          let mode = code.findModeByFileName(file);
+          // let document = code.Doc(text.toString(), mode)
+          let document;
+          let isImage = is_image(file_path);
+          let imageType = image_type(text);
+
+          if (imageType) {
+            let imageTypeMime = imageType.mime;
+            let data = text.toString('base64');
+            base64String = `data:${imageTypeMime};base64,${data}`
+
+          } else {
+            text = text.toString(); // do i actually need to?
+            document = code.Doc(text, mode)  
+          } 
+
+          
+
+          
+
+          let file_obj = {
+
+            
+            "path": file_path, 
+            "mode": mode,
+            "document": document,
+            "isLeaf": true,
+            "title": file,
+            "saved": true, 
+            "isImage": isImage, 
+            "base64": base64String,
+            "key": file_path
+          }
+          results.children.push(file_obj);
+          next();
+        }
+      });
+    })();
+  });
+};
+
+
+
+
+
+
+
+
+
+
+
+
 export default function walk(dir, callback) {
   var results = {
     "path": dir,
@@ -299,28 +510,28 @@ export default function walk(dir, callback) {
 
           } else {
             text = text.toString(); // do i actually need to?
-            document = code.Doc(text, mode)  
-          } 
+            document = code.Doc(text, mode)
+          }
 
-          
 
-          
+
+
 
           let file_obj = {
 
-            
-            "path": dir + "/" + file, 
+
+            "path": dir + "/" + file,
             "mode": mode,
             "document": document,
             "isLeaf": true,
             "title": file,
-            "saved": true, 
-            "isImage": isImage, 
+            "saved": true,
+            "isImage": isImage,
             "base64": base64String
-            
+
             // "key": dir + "/" + file
           }
-          
+
           // file_obj.mode = code.findModeByFileName(file);
           // file_info.document = code.Doc(text, file_obj.mode);
 

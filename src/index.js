@@ -67,9 +67,6 @@ import 'codemirror/mode/jsx/jsx.js';
 import 'codemirror/mode/php/php.js';
 
 
-import { Titlebar, Color } from 'custom-electron-titlebar'
-
-
 
 
 

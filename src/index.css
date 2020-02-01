@@ -81,10 +81,10 @@ body, html, #root {
 }
 
 /* THINK ABOU THIS */
-.cm-s-material-darker .cm-error {
+/* .cm-s-material-darker .cm-error {
   background-color: transparent !important;
   color: #FF5370;
-}
+} */
 
 .CodeMirror-hints {
     

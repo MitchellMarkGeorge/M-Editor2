@@ -40,8 +40,8 @@ export default class CodeEditor extends Component {
             this.saveFile();
         });
 
-        const appMenu = this.props.Appmenu;
-        console.log(appMenu)
+        // const appMenu = this.props.Appmenu;
+        // console.log(appMenu)
         // appMenu.append({
         //     label: 'Editor' ,
         //     submenu: [
@@ -185,10 +185,10 @@ export default class CodeEditor extends Component {
             styleActiveLine: true,
             //placeholder: 'Code goes here...',
             keyMap: 'sublime',
-            extraKeys: {"Ctrl-Space": "autocomplete" , ".": (cm) => {
-                setTimeout(() => {
-                  cm.execCommand("autocomplete")
-                    }, 100); throw new Error('Need this error to show to work');}},
+            // extraKeys: {"Ctrl-Space": "autocomplete" , ".": (cm) => {
+            //     setTimeout(() => {
+            //       cm.execCommand("autocomplete")
+            //         }, 100); throw new Error('Need this error to show to work');}},
             theme: 'material-darker',
             colorpicker: {
                 mode: 'edit'
@@ -198,9 +198,7 @@ export default class CodeEditor extends Component {
         // reconsider
         // this.codeEditor.on("keyup", function (cm, event) {
         //     //console.log(event.keyCode)
-        //     if (!cm.state.completionActive && (event.keyCode && event.keyCode > 64 && event.keyCode < 91 
-                
-        //         )) {
+        //     if (!cm.state.completionActive && (event.keyCode && event.keyCode > 64 && event.keyCode < 91)) {
                 
                 
         //         codemirror.commands.autocomplete(cm);
@@ -249,13 +247,18 @@ export default class CodeEditor extends Component {
 
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps, prevState) {
+        //console.log('changed')
+
+        if (prevState.currentFile.props.path !== this.state.currentFile.props.path) {
+            this.swapDoc();
+        }
         //this.codeEditor.setOption('value', this.state.currentFile.props.title);
         // setFileName
         // swap doc
         //console.log(this.state.currentFile.props);
         // this.codeEditor.refresh();
-        this.swapDoc();
+        //this.swapDoc();
         // if (this.state.currentFile) {
         //     console.log(this.state.currentFile.props);
         //     let object = this.state.currentFile.props;
