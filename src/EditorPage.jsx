@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+import Logo from '../M-Editor.png'
 import CodeEditor from "./CodeEditor";
 import ImageViewer from "./ImageViewer";
 import FileTree from "./FileTree";
@@ -7,7 +7,7 @@ import SplitPane from "react-split-pane";
 import { ipcRenderer } from "electron";
 import { Icon } from "antd";
 import walk from "./FileDta";
-import { walk2 } from "./FileDta"
+import { walk2, configContent } from "./FileDta"
 import CommandPalette from "react-command-palette";
 import { remote } from "electron";
 import * as os from "os";
@@ -52,7 +52,7 @@ export default class EditorPage extends Component {
 
   constructor(props) {
     super(props);
-
+    
     //this.CodeEditor = React.createRef();
 
     let Menu = remote.Menu;
@@ -271,7 +271,11 @@ export default class EditorPage extends Component {
       hasGitRepo: false,
       currrentFileName: "Welcome. Select a file to begin.",
       currentFileLang: "",
-      commands: this.initalcommands
+      commands: this.initalcommands,
+      cursorPosition: undefined,
+      // cursorLine: 0,
+      // cursorCol: 0,
+
       // might have currrentFileName and CurrentFileLang but it might all be in the curent file object
     };
 
@@ -418,7 +422,8 @@ export default class EditorPage extends Component {
               currentFileLang: "",
               currrentFileName: "Welcome. Select a file to begin.",
               commands: this.initalcommands,
-              hasGitRepo: false
+              hasGitRepo: false,
+              cursorPosition: undefined,
             });
             // this.commands = this.copy(this.initalcommands);
             // console.log(this.initalcommands);
@@ -440,19 +445,21 @@ export default class EditorPage extends Component {
       });
     });
   };
+  // codenirror languages
 
 
   generateConfigFile = () => {
     let config_file_path = path_os.resolve(this.state.projectPath, 'm-editor.config.json');
-
+    // set global path
     if (fs.existsSync(config_file_path)) {
       this.showNotification('M-Editor Config file already exists in this project', null, 'error');
-    } else {
+    } else {  // '{\n\t"git": {}\n}'
       try {
-        fs.writeFileSync(config_file_path, '{\n\t"git": {}\n}');
+        fs.writeFileSync(config_file_path, configContent);
         this.refreshFileTree()
         this.showNotification('M-Editor Config file made.', null, 'success');
       } catch (err) {
+        console.log(err)
         this.showNotification('Unable to make M-Editor Config file', null, 'error');
       }
     }
@@ -523,10 +530,11 @@ export default class EditorPage extends Component {
     let config_file_path = path_os.resolve(this.state.projectPath, 'm-editor.config.json');
     console.log(config_file_path)
     try {
-      let config_content = JSON.parse(fs.readFileSync(config_file_path));
+      let config_content = JSON.parse(fs.readFileSync(config_file_path, 'utf8'));
       console.log(config_content)
       return config_content;
     } catch (err) {
+      console.log(err)
       this.showNotification("Unable to read M-Editor Config File", 'Try Again', 'error')
     }
 
@@ -534,7 +542,11 @@ export default class EditorPage extends Component {
 
   commitFiles = () => {
     if (this.state.projectPath) {
-      let commit_message = this.getConfigFileContent()?.git?.commit_message;
+      let commit_message;
+      if (fs.existsSync(path_os.resolve(this.state.projectPath, 'm-editor.config.json'))) {
+        commit_message = this.getConfigFileContent()?.git?.commit_message;
+      }
+
       console.log(this.getConfigFileContent())
       let final_message = commit_message || "new changes made";
 
@@ -687,6 +699,15 @@ export default class EditorPage extends Component {
     this.setState({ currentFile: undefined, currentFileLang: "", currrentFileName: "Welcome. Select a file to begin.", })
   }
 
+  setCursorPosition = (position) => {
+    //console.log(position)
+    if (this.state.currentFile && position) {
+
+      this.setState({ cursorPosition: position })
+
+    }
+  }
+
   refreshFileTree = () => {
 
     if (this.state.projectPath) {
@@ -697,7 +718,7 @@ export default class EditorPage extends Component {
           this.setState({ file_tree: [result] });
           //this.showNotification("File Tree refreshed", null, "success"); // after the setState or after the gitcommands?
           this.addGitCommands();
-          git(this.state.projectPath).status((hello, status) => { console.log(status) })
+
 
 
         } else if (err) {
@@ -785,6 +806,7 @@ export default class EditorPage extends Component {
             openFiles={this.state.openFiles}
             currentFile={this.state.currentFile}
             showNotification={this.showNotification}
+            setCursorPosition={this.setCursorPosition}
 
           />
         );
@@ -801,6 +823,7 @@ export default class EditorPage extends Component {
         >
           <Empty
             className="no-selected-file"
+            image={Logo}
             // image={Empty.PRESENTED_IMAGE_SIMPLE}
             description={<span>Nothing to see here. </span>}
           />
@@ -874,6 +897,14 @@ export default class EditorPage extends Component {
             {this.state.currentFileLang && (
               <span className="low-bar-text">{this.state.currentFileLang}</span>
             )}
+            {(this.state.cursorPosition && !this.state.currentFile.props.base64) && (  // figure out image subbprt
+              <span className="low-bar-text cursor-position">{`Line ${this.state.cursorPosition.line + 1}, Column ${this.state.cursorPosition.ch + 1}`}</span>
+            )}
+            {/* {(this.state.hasGitRepo && this.state.currentFile) && (
+              <span className="low-bar-text git">Git</span>
+            )} */}
+            
+
 
             {/* {this.state.hasGitRepo &&
 

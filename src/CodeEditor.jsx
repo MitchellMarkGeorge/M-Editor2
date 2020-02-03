@@ -169,6 +169,7 @@ export default class CodeEditor extends Component {
             // value: 'Welcome to M-Editor! Select a file to begin.',
             // mode:  "javascript",
             lineNumbers: true,
+            lint: true,
             autocorrect: true,
             spellcheck: true,
             matchBrackets: true,
@@ -176,6 +177,7 @@ export default class CodeEditor extends Component {
             autoCloseBrackets: true,
             autoCloseTags: true,
             showMatchesOnScrollbar: true,
+            gutters: ["CodeMirror-lint-markers"],
             smartIndent: true,
             indentWithTabs: true,
             hintOptions: { completeSingle: false },
@@ -196,6 +198,21 @@ export default class CodeEditor extends Component {
         })
 
         // reconsider
+
+        this.codeEditor.on("focus", (cm, obj) => {
+            //console.log(cm.getCursor());
+            this.props.setCursorPosition(cm.getCursor());
+        })
+
+        this.codeEditor.on("cursorActivity", (cm, obj) => {
+            //console.log(cm.getCursor());
+            this.props.setCursorPosition(cm.getCursor());
+        })
+
+        this.codeEditor.on("swapDoc", (cm, obj) => {
+            //console.log(cm.getCursor());
+            this.props.setCursorPosition(cm.getCursor());
+        })
         // this.codeEditor.on("keyup", function (cm, event) {
         //     //console.log(event.keyCode)
         //     if (!cm.state.completionActive && (event.keyCode && event.keyCode > 64 && event.keyCode < 91)) {

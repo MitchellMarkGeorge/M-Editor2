@@ -332,6 +332,22 @@ import path from 'path';
 
 // }
 
+export const configContent =  //Format on save option, // autosave
+
+`{
+  "git": {
+    "commit_message": "",
+    "remote_name": "",
+    "branch_name": "",
+    "repo_url": ""
+
+  },
+
+  "project": {
+    "live-server": false
+  }
+}`
+
 
 export function walk2(project_path, done) {
 
@@ -396,7 +412,7 @@ export function walk2(project_path, done) {
           let document;
           let isImage = is_image(file_path);
           let imageType = image_type(text);
-
+          // image image support
           if (imageType) {
             let imageTypeMime = imageType.mime;
             let data = text.toString('base64');

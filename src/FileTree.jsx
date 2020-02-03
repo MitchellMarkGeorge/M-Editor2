@@ -116,7 +116,7 @@ export default class Filetree extends Component {
                 
                 const movedToTrash = shell.moveItemToTrash(this.state.rightClickedNodePath);
                 console.log(movedToTrash);
-                if (this.state.rightClickedNodePath == this.props.currentFile.props.path) {
+                if (this?.props?.currentFile && (this.state.rightClickedNodePath == this.props.currentFile.props.path)) {
                     this.props.resetcurrentFile();
                 }
                 this.props.showNotification(`Moved ${path.basename(this.state.rightClickedNodePath)} to trash.`, null, 'success');

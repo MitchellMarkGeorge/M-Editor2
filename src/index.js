@@ -40,20 +40,32 @@ import 'codemirror/addon/selection/active-line.js';
 import 'codemirror/mode/meta.js';
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/keymap/sublime.js';
+import { JSHINT } from 'jshint';
+import CSSLINT from 'csslint';
+import jsonlint from 'jsonlint-mod';
+// import coffeelint from 'coffeelint'; - if supporting CoffeScript
 import 'codemirror/addon/lint/lint.js';
-// import 'codemirror/addon/lint/javascript-lint.js';
-// import 'codemirror/addon/lint/json-lint.js';
-// import 'codemirror/addon/lint/css-lint.js';
+import "codemirror/addon/lint/lint.css";
+import 'codemirror/addon/lint/html-lint.js';
+import 'codemirror/addon/lint/javascript-lint.js';
+import 'codemirror/addon/lint/json-lint.js';
+import 'codemirror/addon/lint/css-lint.js';
 import 'codemirror/addon/display/autorefresh.js'
 
+window.JSHINT = JSHINT;
+console.log(CSSLINT);
+window.CSSLint = CSSLINT.CSSLint;
+window.jsonlint = jsonlint; // if it dosent work, fallback to jslint
+// window.coffeelint = coffeelint; - if supporting CoffeScript
 
 
 
 // LANGS/ MODES
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
 import 'codemirror/mode/javascript/javascript.js';
+// import 'codemirror/mode/coffeescript/coffeescript.js';
 import 'codemirror/mode/markdown/markdown.js';
-import 'codemirror/mode/clike/clike.js';
+import 'codemirror/mode/clike/clike.js'; // includes support for c, c++, c#, java and kotlin
 import 'codemirror/mode/css/css.js';
 import 'codemirror/mode/dart/dart.js';
 import 'codemirror/mode/xml/xml.js';
@@ -80,7 +92,7 @@ class App extends Component {
                 {/* <TitleBar app="M-Editor" title="M-Editor"/> */}
                 <EditorPage />
             </>
-        );
+        ); 
     }
 }
 //  new Titlebar({

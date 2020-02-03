@@ -9,6 +9,7 @@ M-Editor is a revolutionary text editor that supports multiple languages and has
 * Context Menus
 * Image Viewer
 * File Tree
+* Linting (JSON, Javascript (and other supersets like TypeScript), CSS, HTML)
 * ~~Autocomplete~~
 
 More features to come!!!

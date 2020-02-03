@@ -50,6 +50,20 @@
   max-height: calc(100% - 25px) !important;
 } */
 
+.cursor-position {
+  text-align: right !important;
+  float: right !important;
+  margin-right: 9px !important;
+  margin-left: initial !important; 
+
+}
+
+/* .git {
+  float: right !important;
+  margin-right: 9px !important;
+  margin-left: initial !important; 
+} */
+
 .low-bar {
     width: 100% !important;
     height: 25px !important;
@@ -71,12 +85,13 @@
   }
   .low-bar-text {
     /* display: inline; */
-    text-align: center;
+    /* text-align: center; */
     color: #bdbcbc;
     /* line-height: 20px; */
     /* font-size: 12px; */
     /* font-size: 13px; */
     margin-left: 9px;
+    /* text-align: left !important; */
     
     
   

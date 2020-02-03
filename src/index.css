@@ -81,10 +81,17 @@ body, html, #root {
 }
 
 /* THINK ABOU THIS */
-/* .cm-s-material-darker .cm-error {
+.cm-s-material-darker .cm-error {
   background-color: transparent !important;
-  color: #FF5370;
-} */
+  color: red !important;
+}
+
+.CodeMirror-dialog {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol' !important;
+  color: #bdbcbb !important;
+}
 
 .CodeMirror-hints {
     
@@ -100,6 +107,18 @@ body, html, #root {
   /* padding: 0 !important;
   margin: 0 !important; */
 
+}
+
+/* might change error and warning logos */
+
+.CodeMirror-lint-tooltip {
+  border-radius: 0% !important;
+  background-color: #23272a !important;
+  font-family: Menlo, Monaco, 'Courier New', monospace !important;
+  color: #c1c1c2 !important;
+  /* border: 1px solid black !important; */
+  /* border: none !important;  */
+  /* think aboyt max-width */
 }
 
 .CodeMirror-hints .CodeMirror-hint-active {
