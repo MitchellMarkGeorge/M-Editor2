@@ -49,10 +49,10 @@ export default class EditorPage extends Component {
 
 
   // }
-
+  cursorPosition;
   constructor(props) {
     super(props);
-    
+    this.cursorPosition = undefined;
     //this.CodeEditor = React.createRef();
 
     let Menu = remote.Menu;
@@ -264,7 +264,7 @@ export default class EditorPage extends Component {
     ];
     this.state = {
       file_tree: [],
-      openFiles: [],
+      openFiles: [], 
       openPallette: false,
       currentFile: undefined,
       projectPath: "",
@@ -273,6 +273,8 @@ export default class EditorPage extends Component {
       currentFileLang: "",
       commands: this.initalcommands,
       cursorPosition: undefined,
+      errors: 0,
+      warnings: 0
       // cursorLine: 0,
       // cursorCol: 0,
 
@@ -477,16 +479,17 @@ export default class EditorPage extends Component {
             return;
           } else if (result.filePath) {
             fs.writeFile(result.filePath, "", err => {
-              if (err) return;
+              if (err) { console.log(err); return; }
               this.showNotification(
                 `New file ${path_os.basename(result.filePath)} made`,
                 null,
                 "success"
               );
+              this.refreshFileTree();
             });
 
             //console.log(this.getFileObject(result.filePath, this.state.file_tree))
-            this.refreshFileTree();
+
 
           }
         });
@@ -609,6 +612,7 @@ export default class EditorPage extends Component {
         //console.log(isRepo);
         let newArray;
         if (isRepo) {
+          //git(this.state.projectPath).raw(["rev-parse", "--abbrev-ref", 'HEAD'], (err, results) => {console.log(results)})
           this.setState({ hasGitRepo: true });
           //this.hasGitRepo = true;
 
@@ -702,7 +706,7 @@ export default class EditorPage extends Component {
   setCursorPosition = (position) => {
     //console.log(position)
     if (this.state.currentFile && position) {
-
+      // this.cursorPosition = position;
       this.setState({ cursorPosition: position })
 
     }
@@ -736,7 +740,7 @@ export default class EditorPage extends Component {
     let lang;
 
     if (object.mode) {
-      lang = object.mode.name;
+      lang = object.mode.name;  
     } else if (object.isImage) {
       lang = "Image";
     } else {
@@ -750,7 +754,7 @@ export default class EditorPage extends Component {
       currrentFileName: object.title,
       currentFileLang: lang
     });
-    console.log(`clicked ${event.node.props.title}`);
+    //console.log(`clicked ${event.node.props.title}`);
     //console.log(this.state.currentFile);
 
     // if (!object.saved) {
@@ -807,6 +811,7 @@ export default class EditorPage extends Component {
             currentFile={this.state.currentFile}
             showNotification={this.showNotification}
             setCursorPosition={this.setCursorPosition}
+            setErrorAndWarningNumber={this.setErrorAndWarningNumber}
 
           />
         );
@@ -838,6 +843,12 @@ export default class EditorPage extends Component {
     this.open = true;
     console.log("Hello");
   };
+
+  setErrorAndWarningNumber = (errors, warnings) => {
+     
+      this.setState({ errors: errors, warnings: warnings })
+    
+  }
 
   render() {
     return (
@@ -897,13 +908,25 @@ export default class EditorPage extends Component {
             {this.state.currentFileLang && (
               <span className="low-bar-text">{this.state.currentFileLang}</span>
             )}
-            {(this.state.cursorPosition && !this.state.currentFile.props.base64) && (  // figure out image subbprt
+
+
+
+            {(this.state.cursorPosition && !this?.currentFile?.props?.base64) && (  // figure out image subbprt
               <span className="low-bar-text cursor-position">{`Line ${this.state.cursorPosition.line + 1}, Column ${this.state.cursorPosition.ch + 1}`}</span>
             )}
+
+            {(!this?.currentFile?.props?.base64) && (  // figure out image subbprt
+              <>
+                <span className="low-bar-text cursor-position"><Icon type="close-circle" /> {this.state.errors}</span>
+                <span className="low-bar-text cursor-position"><Icon type="warning" /> {this.state.warnings}</span>
+              </>
+            )}
+
+
             {/* {(this.state.hasGitRepo && this.state.currentFile) && (
               <span className="low-bar-text git">Git</span>
             )} */}
-            
+
 
 
             {/* {this.state.hasGitRepo &&

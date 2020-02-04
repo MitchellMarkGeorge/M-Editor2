@@ -41,7 +41,8 @@ import 'codemirror/mode/meta.js';
 import 'codemirror/addon/display/placeholder.js';
 import 'codemirror/keymap/sublime.js';
 import { JSHINT } from 'jshint';
-import CSSLINT from 'csslint';
+import { CSSLint } from 'csslint';
+import { HTMLHint } from 'htmlhint'; // might not need to import this
 import jsonlint from 'jsonlint-mod';
 // import coffeelint from 'coffeelint'; - if supporting CoffeScript
 import 'codemirror/addon/lint/lint.js';
@@ -53,8 +54,8 @@ import 'codemirror/addon/lint/css-lint.js';
 import 'codemirror/addon/display/autorefresh.js'
 
 window.JSHINT = JSHINT;
-console.log(CSSLINT);
-window.CSSLint = CSSLINT.CSSLint;
+window.CSSLint = CSSLint; // 
+window.HTMLHint = HTMLHint;
 window.jsonlint = jsonlint; // if it dosent work, fallback to jslint
 // window.coffeelint = coffeelint; - if supporting CoffeScript
 
@@ -66,13 +67,13 @@ import 'codemirror/mode/javascript/javascript.js';
 // import 'codemirror/mode/coffeescript/coffeescript.js';
 import 'codemirror/mode/markdown/markdown.js';
 import 'codemirror/mode/clike/clike.js'; // includes support for c, c++, c#, java and kotlin
-import 'codemirror/mode/css/css.js';
+import 'codemirror/mode/css/css.js'; // scss, css, less
 import 'codemirror/mode/dart/dart.js';
 import 'codemirror/mode/xml/xml.js';
 import 'codemirror/mode/sql/sql.js';
 import 'codemirror/mode/gfm/gfm.js';
 import 'codemirror/mode/python/python.js';
-import 'codemirror/mode/sass/sass.js';
+import 'codemirror/mode/sass/sass.js'; 
 import 'codemirror/mode/handlebars/handlebars.js';
 import 'codemirror//mode/swift/swift.js';
 import 'codemirror/mode/jsx/jsx.js';

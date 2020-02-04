@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { Button, Tree } from 'antd';
-import { remote } from "electron";
+import { remote, clipboard } from "electron";
 
 import * as path from 'path';
 
@@ -9,7 +9,8 @@ import * as path from 'path';
 import './FileTree.css'
 
 const { TreeNode, DirectoryTree } = Tree;
-const { shell, clipboard } = remote;
+// const { shell, clipboard } = remote;
+const { shell } = remote;
 
 export default class Filetree extends Component {
 
