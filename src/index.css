@@ -127,10 +127,25 @@ body, html, #root {
 
   border-radius: 0% !important;
 
+  
+
 }
+
+.CodeMirror-hints .material-darker {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol' !important; 
+    /* thik about this 
+    IF so, increase font size*/
+}
+
 
 .CodeMirror-hint {
   color: #abb2bf !important;
+  font-family: Menlo, Monaco, 'Courier New', monospace !important;
+  /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol' !important; */
 }
 
 .CodeMirror {

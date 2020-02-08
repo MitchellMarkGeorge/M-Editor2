@@ -54,7 +54,9 @@ module.exports = {
         new CopyPlugin([
           {from: 'M-Editor.png', to: 'M-Editor.png'},
           // {from: 'main.js', to: 'main.js'}
-        ])
+        ]),
+
+        
 
     
 

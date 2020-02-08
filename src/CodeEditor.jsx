@@ -3,6 +3,7 @@ import * as codemirror from 'codemirror'
 import { notification } from 'antd';
 import { remote } from "electron";
 import * as fs from 'fs';
+import beautifyJS from 'js-beautify';
 import { ipcRenderer } from "electron";
 import { RECEIVED_SAVE_FILE_SIGNAL } from "../utils/constants";
 // import { Empty } from 'antd';
@@ -16,7 +17,8 @@ import './CodeEditor.css';
 
 import Moustrap from 'mousetrap';
 
-
+const beautifyCSS = beautifyJS.css;
+const beautifyHTML = beautifyJS.html;
 
 
 
@@ -65,8 +67,8 @@ export default class CodeEditor extends Component {
         if (this.state.currentFile) {
             console.log(this.state.currentFile.props);
             let object = this.state.currentFile.props;
-            console.log(object.document.cm);
-            if (object.document.cm) { console.log('hello', object.document.cm); object.document.cm = null; } // why was this giving an eror
+            console.log(object.document.cm); //might not need this
+            if (object.document.cm) { console.log('hello', object.document.cm); object.document.cm = null; } // might not need this
             this.codeEditor.swapDoc(object.document);
             // if (!object.saved) {
             //     this.props.setFileName(`${object.title} (Unsaved)`);
@@ -80,7 +82,121 @@ export default class CodeEditor extends Component {
             //   }
             this.codeEditor.setOption('mode', object.mode?.mime);
             this.codeEditor.setOption('mode', this.codeEditor.getOption('mode'));
+
+            //switch off linting
+            let lang = object.mode?.name.toLowerCase();
+            console.log(lang);
+            // if (!(lang == 'javascript' || lang == 'css' || lang == 'json' || lang == 'html' )) {
+            //     this.codeEditor.setOption('lint', false);
+            //     console.log('here')
+            // } else {
+            //     this.codeEditor.setOption('lint', );
+            // }
+            this.setLintOption(lang);
             //console.log(this.state.currentFile.props);
+        }
+    }
+
+    getLintOptions = (lang) => {
+        let options;
+        if (lang === 'javascript') {
+            options = { //look at options JSHINT, csslint options
+                // https://github.com/CSSLint/csslint/wiki/Rules
+                //https://jshint.com/docs/options/
+                //   'asi': false,
+                //   'curly': true,
+                //   "browser": true,
+                //   "jquery": true,
+                //   "devel": true,
+                //   "varstmt": true, // think about this
+                //   "node": true,
+                //   "latedef": false, // look at this
+                //   "undef": true,
+                //   "trailing": true,     // Prohibit trailing whitespaces.
+                //   "unused": true,
+                //   'eqeqeq': true,
+                //WATCH HOW MANY OPTIONS I AM LOADING!!!!
+                //CSS RULES (REVIEW)
+                // 'duplicate-properties': true,
+                // 'unqualified-attributes': true,
+                // 'regex-selectors': true,
+                // 'floats': true,
+                // 'fallback-colors': true,
+                // 'empty-rules': true,
+                // 'shorthand': true,
+                // 'no-empty-rulesets': 1,
+                // JS RULES (REVIEW)
+                'maxerr': 100,
+                "node": true,
+                "browser": true,
+                // "esnext": true,
+                // "bitwise": true,
+                "predef": [         // Extra globals.
+                    'chrome', "browser" // "require"
+                ],
+                "curly": true,
+                "eqeqeq": true,
+                //"immed": true,
+                //"indent": 2,
+                // "latedef": "nofunc", //true
+                // "laxbreak": true,
+                //"newcap": true,
+                //"noarg": true, //think about this
+                // "quotmark": "single",
+                //"regexp": true,
+                "undef": true,
+                "unused": true,
+                // "strict": true,
+                // "trailing": true,
+                // "smarttabs": true,
+                // "expr": true,
+                "node": true,
+                'worker': true,
+                // "globalstrict": true,
+                // "esnext": true, // think about this
+                //   '-W041': false,????
+                //   "globalstrict": true, 
+                'esversion': 10
+            }
+        } else if (lang === 'css') {
+            options = {
+                'duplicate-properties': true,
+                'unqualified-attributes': true,
+                'regex-selectors': true,
+                'floats': true,
+                'fallback-colors': true,
+                'empty-rules': true,
+                'shorthand': true,
+                'no-empty-rulesets': 1,
+            }
+        } 
+
+        return options;
+    }
+
+    setLintOption = (lang) => {
+        if ((lang === 'javascript' || lang === 'css' || lang === 'json' || lang === 'html')) {
+            this.codeEditor.setOption('lint', {
+                onUpdateLinting: ((annotations) => {
+                    //console.log("annotations change", annotations); 
+
+                    if (this?.state?.currentFile?.props?.mode && this?.state?.currentFile?.props?.mode?.name === 'JSON') {
+                        let json_errors = annotations.length;
+                        this.props.setErrorAndWarningNumber(json_errors, 0);
+                    } else {
+
+                        //this.props.setErrorAndWarningNumber
+                        let errors = annotations.filter((item) => item.severity === 'error').length;
+                        let warnings = annotations.filter((item) => item.severity === 'warning').length;
+                        this.props.setErrorAndWarningNumber(errors, warnings);
+                    }
+                }),
+                options: this.getLintOptions(lang)
+            });
+
+        } else {
+            this.codeEditor.setOption('lint', false);
+            console.log('here');
         }
     }
 
@@ -91,7 +207,7 @@ export default class CodeEditor extends Component {
             placement: 'bottomRight',
             description: description,
             className: 'notification',
-            style: {
+            style: { 
                 backgroundColor: '#23272a',
                 // color: 'white'
             }
@@ -134,6 +250,46 @@ export default class CodeEditor extends Component {
 
     //   }
 
+    beautifyCode = () => {
+        let mode = this.state.currentFile.props.mode.name.toLowerCase();
+        let currentDoc = this.codeEditor.getDoc();
+        let position = currentDoc.getCursor();
+        // getValue()
+        if (mode === 'javascript' || mode === 'jsx' || mode === 'typescript') {
+            currentDoc.setValue(beautifyJS(currentDoc.getValue()))
+        } else if (mode === 'html') {
+            currentDoc.setValue(beautifyHTML(currentDoc.getValue()))
+        } else if (mode === 'css' || mode === 'scss' || mode === 'less' || mode === 'sass') {
+            // confirm this works for all modes
+            currentDoc.setValue(beautifyCSS(currentDoc.getValue()))
+            //hint = codemirror.hint.css;
+
+        }
+
+        setTimeout(() => {
+            this.codeEditor.focus();
+            currentDoc.setCursor({ line: position.line, ch: position.ch + 2 })
+        }, 0);
+        // do i still need this
+
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+
+        if (nextProps.currentFile.props.path !== this.props.currentFile.props.path) {
+            
+            return true; // should i use state insead?
+        }
+
+        // console.log('not changing');
+
+        return false;
+
+        // if (prevProps.currentFile.props.path !== this.props.currentFile.props.path) {
+        //     this.swapDoc();
+        // }
+
+    }
     static getDerivedStateFromProps(props, state) {
 
         // Any time the current user changes,
@@ -162,7 +318,7 @@ export default class CodeEditor extends Component {
 
 
 
-        codemirror.commands.autocomplete =  (cm) => {
+        codemirror.commands.autocomplete = (cm) => {
             let hint;
             // look at all applicable languages
             let mode = this.state.currentFile.props.mode.name.toLowerCase();
@@ -176,9 +332,9 @@ export default class CodeEditor extends Component {
                 hint = codemirror.hint.css;
 
             } else {
-                hint = codemirror.hint.anyword
+                hint = codemirror.hint.anyword;
             }
-            cm.showHint({ hint: hint});
+            cm.showHint({ hint: hint });
         };
 
 
@@ -189,7 +345,8 @@ export default class CodeEditor extends Component {
             // value: 'Welcome to M-Editor! Select a file to begin.',
             // mode:  "javascript",
             lineNumbers: true,
-            lint: true,
+            // lint: true,
+            dragDrop: false,
             autocorrect: true,
             spellcheck: true,
             matchBrackets: true,
@@ -201,88 +358,92 @@ export default class CodeEditor extends Component {
             smartIndent: true,
             indentWithTabs: true,
             hintOptions: { completeSingle: false },
-            lint: true,
-            lint: {
-                onUpdateLinting: ((annotations) => {
-                    console.log("annotations change", annotations); 
+            // lint: true,
+            // lint: {
+            //     onUpdateLinting: ((annotations) => {
+            //         //console.log("annotations change", annotations); 
 
-                     if (this.state.currentFile.props.mode.name == 'JSON') {
-                         let json_errors = annotations.length;
-                         this.props.setErrorAndWarningNumber(json_errors, 0);
-                     } else {
+            //         if (this?.state?.currentFile?.props?.mode && this?.state?.currentFile?.props?.mode?.name === 'JSON') {
+            //             let json_errors = annotations.length;
+            //             this.props.setErrorAndWarningNumber(json_errors, 0);
+            //         } else {
 
-                    //this.props.setErrorAndWarningNumber
-                    let errors = annotations.filter((item) => item.severity === 'error').length;
-                    let warnings = annotations.filter((item) => item.severity === 'warning').length;
-                    this.props.setErrorAndWarningNumber(errors, warnings);
-                     }
-                }),
-                options: { //look at options JSHINT, csslint options
-                    // https://github.com/CSSLint/csslint/wiki/Rules
-                    //https://jshint.com/docs/options/
-                    //   'asi': false,
-                    //   'curly': true,
-                    //   "browser": true,
-                    //   "jquery": true,
-                    //   "devel": true,
-                    //   "varstmt": true, // think about this
-                    //   "node": true,
-                    //   "latedef": false, // look at this
-                    //   "undef": true,
-                    //   "trailing": true,     // Prohibit trailing whitespaces.
-                    //   "unused": true,
-                    //   'eqeqeq': true,
-                    //WATCH HOW MANY OPTIONS I AM LOADING!!!!
-                    //CSS RULES (REVIEW)
-                    'duplicate-properties': true, 
-                    'unqualified-attributes': true,
-                    'regex-selectors': true,
-                    'floats': true,
-                    'fallback-colors': true,
-                    'empty-rules': true, 
-                    'shorthand': true,
-                    // JS RULES (REVIEW)
-                    'maxerr': 100,
-                    "node": true,
-                    "browser": true,
-                    "esnext": true,
-                    "bitwise": true,
-                    "predef": [         // Extra globals.
-                        "require", 'chrome'
-                      ],
-                    "curly": true,
-                    "eqeqeq": true,
-                    "immed": true,
-                    "indent": 2,
-                    "latedef": "nofunc", //true
-                    // "laxbreak": true,
-                    "newcap": true,
-                    "noarg": true,
-                    // "quotmark": "single",
-                    "regexp": true,
-                    "undef": true,
-                    "unused": true,
-                    // "strict": true,
-                    "trailing": true,
-                    "smarttabs": true,
-                    "expr": true,
-                    "node": true,
-                    // "globalstrict": true,
-                    "esnext": true, // think about this
-                    //   '-W041': false,????
-                    //   "globalstrict": true, 
-                    //   'esversion': 10
-                }
-            },
+            //             //this.props.setErrorAndWarningNumber
+            //             let errors = annotations.filter((item) => item.severity === 'error').length;
+            //             let warnings = annotations.filter((item) => item.severity === 'warning').length;
+            //             this.props.setErrorAndWarningNumber(errors, warnings);
+            //         }
+            //     }),
+            //     options: { //look at options JSHINT, csslint options
+            //         // https://github.com/CSSLint/csslint/wiki/Rules
+            //         //https://jshint.com/docs/options/
+            //         //   'asi': false,
+            //         //   'curly': true,
+            //         //   "browser": true,
+            //         //   "jquery": true,
+            //         //   "devel": true,
+            //         //   "varstmt": true, // think about this
+            //         //   "node": true,
+            //         //   "latedef": false, // look at this
+            //         //   "undef": true,
+            //         //   "trailing": true,     // Prohibit trailing whitespaces.
+            //         //   "unused": true,
+            //         //   'eqeqeq': true,
+            //         //WATCH HOW MANY OPTIONS I AM LOADING!!!!
+            //         //CSS RULES (REVIEW)
+            //         'duplicate-properties': true,
+            //         'unqualified-attributes': true,
+            //         'regex-selectors': true,
+            //         'floats': true,
+            //         'fallback-colors': true,
+            //         'empty-rules': true,
+            //         'shorthand': true,
+            //         // 'no-empty-rulesets': 1,
+            //         // JS RULES (REVIEW)
+            //         'maxerr': 100,
+            //         "node": true,
+            //         "browser": true,
+            //         // "esnext": true,
+            //         "bitwise": true,
+            //         "predef": [         // Extra globals.
+            //             'chrome', "browser" // "require"
+            //         ],
+            //         "curly": true,
+            //         "eqeqeq": true,
+            //         //"immed": true,
+            //         //"indent": 2,
+            //         "latedef": "nofunc", //true
+            //         // "laxbreak": true,
+            //         //"newcap": true,
+            //         //"noarg": true, //think about this
+            //         // "quotmark": "single",
+            //         //"regexp": true,
+            //         "undef": true,
+            //         "unused": true,
+            //         // "strict": true,
+            //         "trailing": true,
+            //         "smarttabs": true,
+            //         "expr": true,
+            //         "node": true,
+            //         // "globalstrict": true,
+            //         // "esnext": true, // think about this
+            //         //   '-W041': false,????
+            //         //   "globalstrict": true, 
+            //         'esversion': 10
+            //     }
+            // },
             // gutters: ["CodeMirror-lint-markers"],
             // lineWrapping: true, // lines should not be too long anywahy
             styleActiveLine: true,
             //placeholder: 'Code goes here...',
             keyMap: 'sublime',
-            extraKeys: {"Ctrl-Space": "autocomplete" , ".": (cm) => {
-                setTimeout(() => {
-                  cm.execCommand("autocomplete")
-                    }, 100); throw new Error('Need this error to show to work');}},
+            extraKeys: {
+                "Ctrl-Space": "autocomplete", ".": (cm) => {
+                    setTimeout(() => {
+                        cm.execCommand("autocomplete")
+                    }, 100); throw new Error('Need this error to show to work');
+                }
+            },
             theme: 'material-darker',
             colorpicker: {
                 mode: 'edit'
@@ -294,6 +455,7 @@ export default class CodeEditor extends Component {
             this.props.setCursorPosition(cm.getCursor());
         })
 
+
         this.codeEditor.on("cursorActivity", (cm, obj) => {
             //console.log(cm.getCursor());
             //console.log('activity')
@@ -304,6 +466,8 @@ export default class CodeEditor extends Component {
             //console.log(cm.getCursor());
             this.props.setCursorPosition(cm.getCursor());
         })
+
+        
 
         // reconsider
 
@@ -321,18 +485,23 @@ export default class CodeEditor extends Component {
         menu.append(new remote.MenuItem({ label: 'Go To End', click: (e) => { console.log(e); this.codeEditor.execCommand('goDocEnd') } }));
         menu.append(new remote.MenuItem({ label: 'Undo', click: () => { this.codeEditor.execCommand('undo') } }));
         menu.append(new remote.MenuItem({ label: 'Redo', click: () => { this.codeEditor.execCommand('redo') } }));
-        menu.append(new remote.MenuItem({ label: 'Comment', click: () => { this.codeEditor.execCommand('toggleCommentIndented') } }));
+        menu.append(new remote.MenuItem({ label: 'Toggle Comment', click: () => { this.codeEditor.execCommand('toggleCommentIndented') } }));
         menu.append(new remote.MenuItem({ label: 'Find', click: (e) => { console.log(e); this.codeEditor.execCommand('find') } }));
         menu.append(new remote.MenuItem({ label: 'Select All', click: () => { this.codeEditor.execCommand('selectAll') } }));
         menu.append(new remote.MenuItem({ label: 'Indent', click: () => { this.codeEditor.execCommand('defaultTab') } }));
         menu.append(new remote.MenuItem({ label: 'Replace', click: () => { this.codeEditor.execCommand('replace') } }));
         menu.append(new remote.MenuItem({ label: 'Replace All', click: () => { this.codeEditor.execCommand('replaceAll') } }));
+        menu.append(new remote.MenuItem({ label: 'Beautify Code', click: () => { this.beautifyCode() } }));
         menu.append(new remote.MenuItem({ type: 'separator' }));
         menu.append(new remote.MenuItem({ label: 'Save File', click: () => { this.codeEditor.execCommand('save') } }));
 
 
 
         this.menu = menu;
+
+        // this.codeEditor.on("contextmenu", (cm, event) => {
+            
+        // });
 
         //console.log(codemirror.commands);
         this.swapDoc();
@@ -364,9 +533,9 @@ export default class CodeEditor extends Component {
     componentDidUpdate(prevProps, prevState) {
         //console.log('changed')
         //prevState.currentFile.props.path !== this.state.currentFile.props.path
-        if (prevProps.currentFile.props.path !== this.props.currentFile.props.path) {
+        //if (prevProps.currentFile.props.path !== this.props.currentFile.props.path) {
             this.swapDoc();
-        }
+        //}
         //this.codeEditor.setOption('value', this.state.currentFile.props.title);
         // setFileName
         // swap doc

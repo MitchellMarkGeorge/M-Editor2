@@ -16,7 +16,7 @@ import * as git from "simple-git";
 import * as path_os from "path";
 import * as child_proccess from "child_process";
 import Moustrap from 'mousetrap';
-
+import AppIcon from '../M-Editor.png'
 const { dialog, Menu } = remote;
 
 const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
@@ -32,6 +32,11 @@ import {
 } from "../utils/constants";
 
 import "./EditorPage.css";
+
+import { TitleBar } from 'electron-react-titlebar'
+import 'electron-react-titlebar/assets/style.css'
+
+const currentWindow = remote.getCurrentWindow();
 
 // TODO:
 // - Git status and icon
@@ -57,7 +62,7 @@ export default class EditorPage extends Component {
 
     let Menu = remote.Menu;
 
-    let template = [
+    this.template = [
       ...(isMac
         ? [
           {
@@ -206,7 +211,7 @@ export default class EditorPage extends Component {
       // }
     ];
 
-    let appMenu = Menu.buildFromTemplate(template);
+    let appMenu = Menu.buildFromTemplate(this.template);
     Menu.setApplicationMenu(appMenu);
 
     this.initalcommands = [
@@ -426,6 +431,8 @@ export default class EditorPage extends Component {
               commands: this.initalcommands,
               hasGitRepo: false,
               cursorPosition: undefined,
+              warnings: 0,
+              errors: 0
             });
             // this.commands = this.copy(this.initalcommands);
             // console.log(this.initalcommands);
@@ -734,6 +741,7 @@ export default class EditorPage extends Component {
 
   onClick = (keys, event) => {
     //console.log(event);
+    // const projectName = path_os.basename(this.state.projectPath);
     let object = event.node.props;
     // if (object.path === this.state?.currentFile?.props?.path) return;
     // let lang = object.mode ? object.mode.name : "Plain Text";
@@ -752,8 +760,11 @@ export default class EditorPage extends Component {
     this.setState({
       currentFile: event.node,
       currrentFileName: object.title,
-      currentFileLang: lang
+      currentFileLang: lang,
+      // warnings: 0, //might not need to do this
+      // errors: 0
     });
+    // currentWindow.setTitle(`${object.title} - ${projectName}`); // dont really ned to do this
     //console.log(`clicked ${event.node.props.title}`);
     //console.log(this.state.currentFile);
 
@@ -853,7 +864,10 @@ export default class EditorPage extends Component {
   render() {
     return (
       <>
+      {/* <TitleBar menu={this.template} icon={AppIcon} />   */}
         {this.state.file_tree.length > 0 && (
+          <>
+          
           <CommandPalette
             commands={this.state.commands}
             closeOnSelect={true}
@@ -861,8 +875,14 @@ export default class EditorPage extends Component {
             resetInputOnClose={true}
             placeholder="Enter a command"
             maxDisplayed={10}
+
+            
           />
+          
+          </>
         )}
+
+   
 
         <div className="container">
           {/* remove min size */}
@@ -915,7 +935,7 @@ export default class EditorPage extends Component {
               <span className="low-bar-text cursor-position">{`Line ${this.state.cursorPosition.line + 1}, Column ${this.state.cursorPosition.ch + 1}`}</span>
             )}
 
-            {(!this?.currentFile?.props?.base64) && (  // figure out image subbprt
+            {(this.state.currentFile && !this?.currentFile?.props?.base64) && (  // figure out image subbprt
               <>
                 <span className="low-bar-text cursor-position"><Icon type="close-circle" /> {this.state.errors}</span>
                 <span className="low-bar-text cursor-position"><Icon type="warning" /> {this.state.warnings}</span>

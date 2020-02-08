@@ -333,7 +333,10 @@ import path from 'path';
 // }
 
 export const configContent =  //Format on save option, // autosave
+// for themes, should i set it by default to "material-darker"
 
+// EMBED STACK OVERFLOW IN EDITOR!!!!
+// GITHUB
 `{
   "git": {
     "commit_message": "",
@@ -344,7 +347,12 @@ export const configContent =  //Format on save option, // autosave
   },
 
   "project": {
-    "live-server": false
+    "live-server": false,
+  },
+
+  "editor": {
+    "theme": "",
+    "format_on_save": false 
   }
 }`
 
