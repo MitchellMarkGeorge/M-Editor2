@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import * as electron from 'electron';
-import CodeEditor from './CodeEditor'
+// import * as electron from 'electron';
+// import CodeEditor from './CodeEditor';
 import EditorPage from './EditorPage';
-import { Button } from 'antd';
-import { Menu, MenuItem } from 'electron';
+// import { Button } from 'antd';
+// import { Menu, MenuItem } from 'electron';
 
 // import { TitleBar } from 'electron-react-titlebar';
 // import TitleBar from 'frameless-titlebar';
-import 'electron-react-titlebar/assets/style.css';
+// import 'electron-react-titlebar/assets/style.css';
 
 import './index.css';
 import 'antd/dist/antd.css';
@@ -44,36 +44,26 @@ import { JSHINT } from 'jshint';
 import { CSSLint } from 'csslint';
 import { HTMLHint } from 'htmlhint'; // might not need to import this
 import jsonlint from 'jsonlint-mod';
-// import eslint from 'eslint'; 
-
+// import eslint from 'eslint';
 
 // import sassLint from 'sass-lint';
 // import coffeelint from 'coffeelint'; - if supporting CoffeScript
 import 'codemirror/addon/lint/lint.js';
-import "codemirror/addon/lint/lint.css";
+import 'codemirror/addon/lint/lint.css';
 import 'codemirror/addon/lint/html-lint.js';
 import 'codemirror/addon/lint/javascript-lint.js';
 import 'codemirror/addon/lint/json-lint.js';
-import 'codemirror/addon/lint/css-lint.js'; 
+import 'codemirror/addon/lint/css-lint.js';
 // import './eslint-lint';
 // import './stylelint'
-import 'codemirror/addon/display/autorefresh.js'
-
-window.JSHINT = JSHINT;
-window.CSSLint = CSSLint; // 
-// window.Stylelint = stylelint;
-// window.eslint = eslint;
-window.HTMLHint = HTMLHint;
-window.jsonlint = jsonlint;
+import 'codemirror/addon/display/autorefresh.js';
 // window.SCSSLint = sassLint; // if it dosent work, fallback to jslint
 // window.coffeelint = coffeelint; - if supporting CoffeScript
-
-
 
 // LANGS/ MODES
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
 import 'codemirror/mode/javascript/javascript.js';
-// import 'codemirror/mode/coffeescript/coffeescript.js'; 
+// import 'codemirror/mode/coffeescript/coffeescript.js';
 import 'codemirror/mode/markdown/markdown.js';
 import 'codemirror/mode/clike/clike.js'; // includes support for c, c++, c#, java and kotlin
 import 'codemirror/mode/css/css.js'; // scss, css, less
@@ -82,34 +72,32 @@ import 'codemirror/mode/xml/xml.js';
 import 'codemirror/mode/sql/sql.js';
 import 'codemirror/mode/gfm/gfm.js';
 import 'codemirror/mode/python/python.js';
-import 'codemirror/mode/sass/sass.js'; 
+import 'codemirror/mode/sass/sass.js';
 import 'codemirror/mode/handlebars/handlebars.js';
 import 'codemirror//mode/swift/swift.js';
 import 'codemirror/mode/jsx/jsx.js';
 import 'codemirror/mode/php/php.js';
- 
 
-
-
-
-
+window.JSHINT = JSHINT;
+window.CSSLint = CSSLint; //
+// window.Stylelint = stylelint;
+// window.eslint = eslint;
+window.HTMLHint = HTMLHint;
+window.jsonlint = jsonlint;
 
 class App extends Component {
-    render() {
-
-        return (
-            <>
-                {/* <TitleBar app="M-Editor" title="M-Editor"/> */}
-                <EditorPage />
-            </>
-        ); 
-    }
+  render () {
+    return (
+      <>
+        {/* <TitleBar app="M-Editor" title="M-Editor"/> */}
+        <EditorPage />
+      </>
+    );
+  }
 }
 //  new Titlebar({
 //     backgroundColor: Color.fromHex('#fff'),
 //     shadow: true
 // });
 
-
 ReactDOM.render(<App />, document.getElementById('root'));
-

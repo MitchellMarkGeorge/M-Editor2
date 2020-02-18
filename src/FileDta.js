@@ -6,7 +6,6 @@ import * as path_os from 'path';
 import * as is_image from 'is-image';
 import * as image_type from 'image-type';
 
-
 // import * as os from 'os';
 
 import * as code from 'codemirror';
@@ -16,16 +15,10 @@ import * as code from 'codemirror';
 // // const os = require('os');
 // // const code = require('codemirror');
 
-
-
-
 // export default class Filetree2 {
-
 
 //   // add icons
 //   // create codemirrot documents for each file
-
-
 
 //   constructor(path, name = null, isLeaf = false) {
 //     this.path = path;
@@ -67,15 +60,8 @@ import * as code from 'codemirror';
 //   //text
 //   // would rather use numbers
 
-
-
-
-
-
 //   static readDir(path) {
 //     let fileArray = [];
-
-
 
 //     let inital_array = fs.readdirSync(path);
 //     // console.log(inital_array);
@@ -106,12 +92,9 @@ import * as code from 'codemirror';
 //       this.removeItem(inital_array, '.vscode');
 //     }
 
-
-
 // 	if (inital_array.includes('.DS_Store')) {
 // 	  this.removeItem(inital_array, '.DS_Store');
 // 	}
-
 
 //     inital_array.forEach(file => {
 //       let file_path = path_os.join(path, file);
@@ -131,7 +114,6 @@ import * as code from 'codemirror';
 
 //           file_info.children = Filetree2.readDir(file_info.path);
 
-
 //         } else if (stat.isFile()) {
 
 //           //console.log('File')
@@ -141,10 +123,8 @@ import * as code from 'codemirror';
 //           file_info.key = file_info.path;
 //           // i could also use label (i can have some files with the same name)
 
-
-
 //           fs.readFile(file_path, (err, file) => {
-//             if (file) { 
+//             if (file) {
 //             let text = file.toString();
 //             file_info.mode = code.findModeByFileName(file_info.title);
 //             file_info.document = code.Doc(text, file_info.mode);
@@ -158,8 +138,6 @@ import * as code from 'codemirror';
 //             console.error(err);
 
 //           }
-
-
 
 //         });
 
@@ -177,9 +155,7 @@ import * as code from 'codemirror';
 
 //         // should i still do this???
 
-
 //       //fileArray.push(file_info);
-
 
 //       }});
 
@@ -196,18 +172,14 @@ import * as code from 'codemirror';
 
 //     //   // should i still do this???
 
-
 //     fileArray.push(file_info);
 
-
 //     });
-
-
 
 //     return fileArray;
 //   }
 
-//   static removeItem(arr, item) { 
+//   static removeItem(arr, item) {
 //      let index = arr.indexOf(item);
 
 //      if (index !== -1) {
@@ -222,7 +194,6 @@ import * as code from 'codemirror';
 //     this.children = Filetree2.readDir(this.path);
 
 //   }
-
 
 // }
 
@@ -268,8 +239,6 @@ import path from 'path';
 //       removeItem(inital_array, '.vscode');
 //     }
 
-
-
 //     if (inital_array.includes('.DS_Store')) {
 //       removeItem(inital_array, '.DS_Store');
 //     }
@@ -287,7 +256,7 @@ import path from 'path';
 //           });
 //         } else {
 //           let file_content = fs.readFileSync(path_os.resolve(project_path, item))
-            
+
 //             if (file_content) {
 //               let base64String;
 //               let text = file_content;
@@ -318,21 +287,19 @@ import path from 'path';
 //                 "base64": base64String
 //               }
 //               rootObject.children.push(file_obj);
-              
+
 //             }
-          
-          
+
 //         }
 //       })
 //       if (!err) {callback(null, rootObject)}
 //     }
-    
-    
+
 //   })
 
 // }
 
-export const configContent =  //Format on save option, // autosave
+export const configContent = // Format on save option, // autosave
 // for themes, should i set it by default to "material-darker"
 
 // EMBED STACK OVERFLOW IN EDITOR!!!!
@@ -347,29 +314,27 @@ export const configContent =  //Format on save option, // autosave
   },
 
   "project": {
-    "live-server": false,
+    
   },
 
   "editor": {
     "theme": "",
     "format_on_save": false 
   }
-}`
+}`;
 
-
-export function walk2(project_path, done) {
-
+export function walk2 (project_path, done) {
   var results = {
-        "path": project_path,
-        "title": path.basename(project_path),
-        "isLeaf": false,
-        "children": [],
-        "selectable": false,
-        "key": project_path 
-      };
+    path: project_path,
+    title: path.basename(project_path),
+    isLeaf: false,
+    children: [],
+    selectable: false,
+    key: project_path
+  };
 
-  //results.key = results.path;
-  fs.readdir(project_path, function(err, list) {
+  // results.key = results.path;
+  fs.readdir(project_path, function (err, list) {
     if (err) return done(err);
     if (list.length === 0) {
       console.log('empty arr');
@@ -378,103 +343,80 @@ export function walk2(project_path, done) {
     // dont load node_modules files OR .git (do i need to remove .git???)
     if (list.includes('node_modules')) {
       removeItem(list, 'node_modules');
-
     }
 
     if (list.includes('.git')) {
-
       removeItem(list, '.git');
     }
 
     if (list.includes('.idea')) {
-
       removeItem(list, '.idea');
     }
 
     if (list.includes('.vscode')) {
-
       removeItem(list, '.vscode');
     }
 
     var i = 0;
-    (function next() {
+    (function next () {
       var file = list[i++];
-      //console.log(file) // first element in array???
+      // console.log(file) // first element in array???
       if (!file) return done(null, results);
       var file_path = path.resolve(project_path, file);
-      fs.stat(file_path, function(err, stat) {
+      fs.stat(file_path, function (err, stat) {
         if (stat && stat.isDirectory()) {
-          walk(file_path, function(err, res) {
-            
-            //res.key = res.path;
-            //results.key = res.path; 
+          walk(file_path, function (err, res) {
+            // res.key = res.path;
+            // results.key = res.path;
             results.children.push(res);
-            
+
             next();
           });
         } else {
           let base64String;
           let text = fs.readFileSync(file_path);
-          let mode = code.findModeByFileName(file);
+          const mode = code.findModeByFileName(file);
           // let document = code.Doc(text.toString(), mode)
           let document;
-          let isImage = is_image(file_path);
-          let imageType = image_type(text);
+          const isImage = is_image(file_path);
+          const imageType = image_type(text);
           // image image support
           if (imageType) {
-            let imageTypeMime = imageType.mime;
-            let data = text.toString('base64');
-            base64String = `data:${imageTypeMime};base64,${data}`
-
+            const imageTypeMime = imageType.mime;
+            const data = text.toString('base64');
+            base64String = `data:${imageTypeMime};base64,${data}`;
           } else {
             text = text.toString(); // do i actually need to?
-            document = code.Doc(text, mode)  
-          } 
-
-          
-
-          
-
-          let file_obj = {
-
-            
-            "path": file_path, 
-            "mode": mode,
-            "document": document,
-            "isLeaf": true,
-            "title": file,
-            "saved": true, 
-            "isImage": isImage, 
-            "base64": base64String,
-            "key": file_path
+            document = code.Doc(text, mode);
           }
+
+          const file_obj = {
+
+            path: file_path,
+            mode: mode,
+            document: document,
+            isLeaf: true,
+            title: file,
+            saved: true,
+            isImage: isImage,
+            base64: base64String,
+            key: file_path
+          };
           results.children.push(file_obj);
           next();
         }
       });
     })();
   });
-};
+}
 
-
-
-
-
-
-
-
-
-
-
-
-export default function walk(dir, callback) {
+export default function walk (dir, callback) {
   var results = {
-    "path": dir,
-    "title": path.basename(dir),
-    "isLeaf": false,
-    "children": [],
-    "selectable": false
-
+    path: dir,
+    title: path.basename(dir),
+    isLeaf: false,
+    children: [],
+    selectable: false
 
   };
   fs.readdir(dir, function (err, list) {
@@ -487,28 +429,24 @@ export default function walk(dir, callback) {
     // dont load node_modules files OR .git (do i need to remove .git???)
     if (list.includes('node_modules')) {
       removeItem(list, 'node_modules');
-
     }
 
     if (list.includes('.git')) {
-
       removeItem(list, '.git');
     }
 
     if (list.includes('.idea')) {
-
       removeItem(list, '.idea');
     }
 
     if (list.includes('.vscode')) {
-
       removeItem(list, '.vscode');
     }
     var pending = list.length;
     if (!pending) { return callback(null, results); }
     list.forEach(function (file) {
       fs.stat(dir + '/' + file, function (err, stat) {
-        if (stat && stat.isDirectory()) { //path.resolve
+        if (stat && stat.isDirectory()) { // path.resolve
           walk(dir + '/' + file, function (err, res) {
             // results.title = path.basename(results.path); // might handle err here
             // results.isLeaf = false;
@@ -520,41 +458,35 @@ export default function walk(dir, callback) {
           // let path = path_os.resolve(dir, file);
           // let text = fs.readFileSync(dir + "/" + file).toString();
           let base64String;
-          let text = fs.readFileSync(dir + "/" + file);
-          let mode = code.findModeByFileName(file);
+          let text = fs.readFileSync(dir + '/' + file);
+          const mode = code.findModeByFileName(file);
           // let document = code.Doc(text.toString(), mode)
           let document;
-          let isImage = is_image(dir + "/" + file);
-          let imageType = image_type(text);
+          const isImage = is_image(dir + '/' + file);
+          const imageType = image_type(text);
 
           if (imageType) {
-            let imageTypeMime = imageType.mime;
-            let data = text.toString('base64');
-            base64String = `data:${imageTypeMime};base64,${data}`
-
+            const imageTypeMime = imageType.mime;
+            const data = text.toString('base64');
+            base64String = `data:${imageTypeMime};base64,${data}`;
           } else {
             text = text.toString(); // do i actually need to?
-            document = code.Doc(text, mode)
+            document = code.Doc(text, mode);
           }
 
+          const file_obj = {
 
-
-
-
-          let file_obj = {
-
-
-            "path": dir + "/" + file,
-            "mode": mode,
-            "document": document,
-            "isLeaf": true,
-            "title": file,
-            "saved": true,
-            "isImage": isImage,
-            "base64": base64String
+            path: dir + '/' + file,
+            mode: mode,
+            document: document,
+            isLeaf: true,
+            title: file,
+            saved: true,
+            isImage: isImage,
+            base64: base64String
 
             // "key": dir + "/" + file
-          }
+          };
 
           // file_obj.mode = code.findModeByFileName(file);
           // file_info.document = code.Doc(text, file_obj.mode);
@@ -573,13 +505,12 @@ export default function walk(dir, callback) {
       });
     });
   });
-};
+}
 
-function removeItem(arr, item) {
-  let index = arr.indexOf(item);
+function removeItem (arr, item) {
+  const index = arr.indexOf(item);
 
   if (index !== -1) {
     arr.splice(index, 1);
   }
-
 }

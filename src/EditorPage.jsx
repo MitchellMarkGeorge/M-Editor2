@@ -33,8 +33,6 @@ import {
 
 import "./EditorPage.css";
 
-import { TitleBar } from 'electron-react-titlebar'
-import 'electron-react-titlebar/assets/style.css'
 
 const currentWindow = remote.getCurrentWindow();
 
@@ -267,7 +265,7 @@ export default class EditorPage extends Component {
       //   }
       // }
     ];
-    this.state = {
+    this.state = { // might not actually creat state here
       file_tree: [],
       openFiles: [], 
       openPallette: false,
@@ -707,7 +705,7 @@ export default class EditorPage extends Component {
   }
 
   resetcurrentFile = () => {
-    this.setState({ currentFile: undefined, currentFileLang: "", currrentFileName: "Welcome. Select a file to begin.", })
+    this.setState({ currentFile: undefined, currentFileLang: "", currrentFileName: "Welcome. Select a file to begin.", cursorPosition: undefined, warnings: 0, errors: 0})
   }
 
   setCursorPosition = (position) => {
@@ -931,11 +929,11 @@ export default class EditorPage extends Component {
 
 
 
-            {(this.state.cursorPosition && !this?.currentFile?.props?.base64) && (  // figure out image subbprt
+            {(this.state.currentFile && this.state.cursorPosition && !(this?.state.currentFile?.props?.base64)) && (  // figure out image subbprt
               <span className="low-bar-text cursor-position">{`Line ${this.state.cursorPosition.line + 1}, Column ${this.state.cursorPosition.ch + 1}`}</span>
             )}
 
-            {(this.state.currentFile && !this?.currentFile?.props?.base64) && (  // figure out image subbprt
+            {(this.state.currentFile && !(this?.state.currentFile?.props?.base64)) && (  // figure out image subbprt
               <>
                 <span className="low-bar-text cursor-position"><Icon type="close-circle" /> {this.state.errors}</span>
                 <span className="low-bar-text cursor-position"><Icon type="warning" /> {this.state.warnings}</span>

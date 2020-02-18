@@ -83,7 +83,7 @@ export default class Filetree extends Component {
     }
 
     copyRelativePath = () => {
-        try {
+        try { // does it work on images
             let currentFilePath = this.props.currentFile.props.path;
             let relativePath = path.relative(this.state.rightClickedNodePath, currentFilePath);
             clipboard.writeText(relativePath);
@@ -120,8 +120,8 @@ export default class Filetree extends Component {
                 if (this?.props?.currentFile && (this.state.rightClickedNodePath == this.props.currentFile.props.path)) {
                     this.props.resetcurrentFile();
                 }
-                this.props.showNotification(`Moved ${path.basename(this.state.rightClickedNodePath)} to trash.`, null, 'success');
                 this.props.refreshFileTree();
+                this.props.showNotification(`Moved ${path.basename(this.state.rightClickedNodePath)} to trash.`, null, 'success');
             } catch (err) {
                 console.log(err);
                 this.props.showNotification('Could not move item to trash.', 'Try again.', 'error');
