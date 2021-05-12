@@ -75,7 +75,7 @@
   },
   "dependencies": {
     "antd": "^3.26.8",
-    "codemirror": "^5.51.0",
+    "codemirror": "^5.58.2",
     "codemirror-colorpicker": "^1.9.66",
     "coffeelint": "^2.1.0",
     "csslint": "^1.0.5",
